@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { Button, Form, Modal } from 'react-bootstrap';
-import Loading from './Loading';
+// import Loading from './Loading';
 import Popup from './popup';
 import '../styles/orders.css';
 import '../styles/printout.css';

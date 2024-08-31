@@ -6,8 +6,8 @@ import '../styles/login.css';
 
 const LoginForm = () => {
   const [showPopup, setShowPopup] = useState(false);
-  const [doRedirect, setDoRedirect] = useState(false);
-  const [status, setStatus] = useState(false);
+  // const [doRedirect, setDoRedirect] = useState(false);
+  // const [status, setStatus] = useState(false);
   const [msg, setMsg] = useState("");
   const [btnClicked, setBtnClicked] = useState(false);
   const [formData, setFormData] = useState({
@@ -128,8 +128,8 @@ const LoginForm = () => {
         <Popup
           message={msg}
           onClose={handleClosePopup}
-          status={status}
-          doRedirect={doRedirect}
+          status={false}
+          doRedirect={false}
         />
       )}
     </div>

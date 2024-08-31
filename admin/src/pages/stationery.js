@@ -37,37 +37,7 @@ const ProductGrid = () => {
   const[loading, setLoading] = useState(false);
 
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-      if (scrollTop + clientHeight >= scrollHeight - windowHeight/10) {  // Adjusted threshold
-        setPage((prevPage) => prevPage + 1);
-        fetchProducts(undefined,undefined,page+1);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-  
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-      setWindowHeight(window.innerHeight);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    // Cleanup event listener on component unmount
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
 
   const Subtypes = [
    
@@ -91,34 +61,6 @@ const ProductGrid = () => {
 
   ];
 
-
-  // const fetchProducts = async () => {
-  //   try {
-  //     const token = JSON.parse(localStorage.getItem('adminToken'));
-  //     if (!token) {
-  //       console.error('Authorization token not found');
-  //       return;
-  //     }
-  //     const response = await axios.get('https://college-bookmart.onrender.com/api/product/', {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`
-  //       }
-  //     });
-  //     const productsWithImageUrl = await Promise.all(response.data.map(async product => {
-  //       const imgResponse = await axios.get(`https://college-bookmart.onrender.com/api/product/${product._id}/image`, {
-  //         responseType: 'blob',
-  //         headers: {
-  //           Authorization: `Bearer ${token}`
-  //         }
-  //       });
-  //       const imageUrl = URL.createObjectURL(imgResponse.data);
-  //       return { ...product, img: imageUrl };
-  //     }));
-  //     setProducts(productsWithImageUrl);
-  //   } catch (error) {
-  //     console.error('Error fetching products:', error);
-  //   }
-  // };
   const fetchProducts = useCallback(async (filter,term, currPage, productsPerPage = parseInt(windowWidth / 180 * 4)) => {
     try {
       // console.log(productsPerPage);
@@ -174,7 +116,67 @@ const ProductGrid = () => {
       setLoading(false);
       console.error('Error fetching products:', error);
     }
+  }, [appliedFilters,page,searchTerm,windowWidth]);
+  
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+      if (scrollTop + clientHeight >= scrollHeight - windowHeight/10) {  // Adjusted threshold
+        setPage((prevPage) => prevPage + 1);
+        fetchProducts(undefined,undefined,page+1);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [fetchProducts,page,windowHeight]);
+  
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      setWindowHeight(window.innerHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
+  // const fetchProducts = async () => {
+  //   try {
+  //     const token = JSON.parse(localStorage.getItem('adminToken'));
+  //     if (!token) {
+  //       console.error('Authorization token not found');
+  //       return;
+  //     }
+  //     const response = await axios.get('https://college-bookmart.onrender.com/api/product/', {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`
+  //       }
+  //     });
+  //     const productsWithImageUrl = await Promise.all(response.data.map(async product => {
+  //       const imgResponse = await axios.get(`https://college-bookmart.onrender.com/api/product/${product._id}/image`, {
+  //         responseType: 'blob',
+  //         headers: {
+  //           Authorization: `Bearer ${token}`
+  //         }
+  //       });
+  //       const imageUrl = URL.createObjectURL(imgResponse.data);
+  //       return { ...product, img: imageUrl };
+  //     }));
+  //     setProducts(productsWithImageUrl);
+  //   } catch (error) {
+  //     console.error('Error fetching products:', error);
+  //   }
+  // };
+
 
   useEffect(() => {
     // Clear the timeout if `fetchProducts` is called again within the debounce period

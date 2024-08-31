@@ -59,45 +59,8 @@ function StationeryPage() {
 
   ];
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
-      if (scrollTop + clientHeight >= scrollHeight - windowHeight/10) {  // Adjusted threshold
-        setPage((prevPage) => prevPage + 1);
-        fetchProducts(undefined,undefined,page+1);
-      }
-    };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-  
-  
 
-  
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-      setWindowHeight(window.innerHeight);
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    // Cleanup event listener on component unmount
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
- 
-
-  useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-    setCart(storedCart);
-  }, []);
-
- 
   const fetchProducts = useCallback(async (filter,term, currPage, productsPerPage = parseInt(windowWidth / 180 * 4)) => {
     try {
       // console.log(productsPerPage);
@@ -146,7 +109,48 @@ function StationeryPage() {
       setShowPopup(true);
       console.error('Error fetching products:', error);
     }
-  }, []);  
+  }, [appliedFilters, page, searchTerm, windowWidth]);
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+      if (scrollTop + clientHeight >= scrollHeight - windowHeight/10) {  // Adjusted threshold
+        setPage((prevPage) => prevPage + 1);
+        fetchProducts(undefined,undefined,page+1);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [fetchProducts, page,windowHeight]);
+  
+  
+
+  
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+      setWindowHeight(window.innerHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+ 
+
+  useEffect(() => {
+    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+    setCart(storedCart);
+  }, []);
+
+ 
+    
 
   useEffect(() => {
     // Clear the timeout if `fetchProducts` is called again within the debounce period
@@ -309,7 +313,7 @@ function StationeryPage() {
     const subTypes = [];
     let subTypesReturned = [];
     
-    let typeDependency = null;
+    // let typeDependency = null;
     typeDependencies.forEach((obj) => {
       if (obj[type]) {
         
@@ -322,7 +326,7 @@ function StationeryPage() {
            
             subTypes.push(subType);
           }
-          else if(typeDependency = typeDependencies.find(sub=>sub[subType])){
+          else if(typeDependencies.find(sub=>sub[subType])){
              subTypesReturned  =  updateSubTypesToRender(subType);
           }
         });

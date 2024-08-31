@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import '../styles/deleteAccount.css';
 
 const DeleteAccount = () => {
@@ -8,13 +8,14 @@ const DeleteAccount = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [btnClicked, setBtnClicked] = useState(false);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const handleChange = (e) => {
     setConfirmation(e.target.value);
     setError('');
   };
 
   const handleDelete = async () => {
+    setBtnClicked(true);
     if (confirmation.toLowerCase() === 'delete my account') {
       try {
         const token = JSON.parse(sessionStorage.getItem('token'));
@@ -28,15 +29,19 @@ const DeleteAccount = () => {
             sessionStorage.removeItem('username');
             sessionStorage.removeItem('token');
           setSuccess(true);
+          setBtnClicked(false);
           window.location.href = '/signup';
         } else {
           setError('Failed to delete account. Please try again.');
+          setBtnClicked(false);
         }
       } catch (err) {
         setError('Failed to delete account. Please try again.');
+        setBtnClicked(false);
         console.error(err);
       }
     } else {
+      setBtnClicked(false);
       setError('Please type "delete my account" to confirm.');
     }
   };

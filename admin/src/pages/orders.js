@@ -103,7 +103,7 @@ function OrderPage() {
     } catch (error) {
       console.error('Error fetching products:', error);
     }
-  }, []);
+  }, [page,productSearchTerm]);
 
   const handleSearch = () => {
     setProducts([]);
@@ -151,7 +151,7 @@ function OrderPage() {
       } else {
         setImageLoading(false);
       }
-    }, [productId, img]);
+    }, [productId, img,productName]);
 
     return imageLoading ? <div><Loading /></div> : (
       <img
@@ -262,9 +262,9 @@ function OrderPage() {
     setSearchTerm(e.target.value.trim());
   };
 
-  const handleProductSearchChange = (e) => {
-    setProductSearchTerm(e.target.value.trim());
-  };
+  // const handleProductSearchChange = (e) => {
+  //   setProductSearchTerm(e.target.value.trim());
+  // };
 
   const handleAddProduct = (productId) => {
     setProductQuantities((prevQuantities) => {

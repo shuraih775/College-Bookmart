@@ -10,7 +10,7 @@ const SignUpForm = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [msg, setMsg] = useState("");
   const [status, setStatus] = useState(false);
-  const [doRedirect, setDoRedirect] = useState(false);
+  // const [doRedirect, setDoRedirect] = useState(false);
   const [otpSent, setOtpSent] = useState(false); 
   const [showVpaModal, setShowVpaModal] = useState(false);
   const [btnClicked, setBtnClicked] = useState(false);
@@ -218,7 +218,7 @@ const SignUpForm = () => {
           message={msg}
           onClose={handleClosePopup}
           status={status}
-          doRedirect={doRedirect}
+          doRedirect={false}
         />
       )}
       <Modal show={showVpaModal} onHide={handleModalHide}>
