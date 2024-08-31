@@ -43,7 +43,7 @@ const LoginForm = () => {
     e.preventDefault();
     setBtnClicked(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/loginAdmin', {
+      const response = await axios.post('https://college-bookmart.onrender.com/api/auth/loginAdmin', {
         email,
         password
       });

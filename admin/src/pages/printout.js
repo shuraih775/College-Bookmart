@@ -34,7 +34,7 @@ function PrintoutPage() {
 
   const fetchPdfFiles = useCallback(async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/upload/', {
+      const response = await axios.get('https://college-bookmart.onrender.com/api/upload/', {
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('adminToken'))}`
         }
@@ -77,7 +77,7 @@ function PrintoutPage() {
       printout["department"] = department;
       printout["numCopies"] = numCopies;
       printout = JSON.stringify(printout)
-      axios.post('http://localhost:5000/api/upload/manualPrintout',{printout}, {
+      axios.post('https://college-bookmart.onrender.com/api/upload/manualPrintout',{printout}, {
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('adminToken'))}`
         }
@@ -101,7 +101,7 @@ function PrintoutPage() {
   //   try {
   //     const updatedFiles = pdfFiles.filter(parent => parent.id !== parentToRemove.id);
   //     setPdfFiles(updatedFiles);
-  //     const response = await axios.delete(`http://localhost:5000/api/upload/${parentToRemove.id}`, {
+  //     const response = await axios.delete(`https://college-bookmart.onrender.com/api/upload/${parentToRemove.id}`, {
   //       headers: {
   //         Authorization: `Bearer ${JSON.parse(localStorage.getItem('adminToken'))}`
   //       }
@@ -117,7 +117,7 @@ function PrintoutPage() {
 
   const downloadFile = async (fileId, parentId, fileName) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/upload/${parentId}`, {
+      const response = await axios.get(`https://college-bookmart.onrender.com/api/upload/${parentId}`, {
         responseType: 'blob',
         params: {
           fileId: fileId
@@ -156,7 +156,7 @@ function PrintoutPage() {
   const markAsComplete = async (parentId) => {
     try {
       console.log(parentId);
-      const response = await axios.put(`http://localhost:5000/api/upload/${parentId}/complete`, { code }, {
+      const response = await axios.put(`https://college-bookmart.onrender.com/api/upload/${parentId}/complete`, { code }, {
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('adminToken'))}`
         }
@@ -176,7 +176,7 @@ function PrintoutPage() {
   const markAsReadyToPick = async (parentId) => {
     try {
       console.log(parentId);
-      const response = await axios.put(`http://localhost:5000/api/upload/${parentId}/readytopick`, {
+      const response = await axios.put(`https://college-bookmart.onrender.com/api/upload/${parentId}/readytopick`, {
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('adminToken'))}`
         }

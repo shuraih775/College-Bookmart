@@ -66,7 +66,7 @@ function CartPage() {
       console.log(`${key}: ${value}`);
     });
     
-    await axios.post('http://localhost:5000/api/orders', formData, {
+    await axios.post('https://college-bookmart.onrender.com/api/orders', formData, {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'multipart/form-data'

@@ -46,7 +46,7 @@ const handleSubmit = async(e) => {
        if(!token){
         return;
        }
-    const res = await axios.put('http://localhost:5000/api/auth/change-password',{newPassword}, {
+    const res = await axios.put('https://college-bookmart.onrender.com/api/auth/change-password',{newPassword}, {
         headers: {
           Authorization: `Bearer ${token}`
         }

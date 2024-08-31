@@ -99,13 +99,13 @@ const ProductGrid = () => {
   //       console.error('Authorization token not found');
   //       return;
   //     }
-  //     const response = await axios.get('http://localhost:5000/api/product/', {
+  //     const response = await axios.get('https://college-bookmart.onrender.com/api/product/', {
   //       headers: {
   //         Authorization: `Bearer ${token}`
   //       }
   //     });
   //     const productsWithImageUrl = await Promise.all(response.data.map(async product => {
-  //       const imgResponse = await axios.get(`http://localhost:5000/api/product/${product._id}/image`, {
+  //       const imgResponse = await axios.get(`https://college-bookmart.onrender.com/api/product/${product._id}/image`, {
   //         responseType: 'blob',
   //         headers: {
   //           Authorization: `Bearer ${token}`
@@ -146,7 +146,7 @@ const ProductGrid = () => {
             return;
           }
       console.log(page, appliedFilters);
-      const response = await axios.get(`http://localhost:5000/api/product?${queryParams.toString()}`, {
+      const response = await axios.get(`https://college-bookmart.onrender.com/api/product?${queryParams.toString()}`, {
               headers: {
                 Authorization: `Bearer ${token}`
               }
@@ -155,7 +155,7 @@ const ProductGrid = () => {
       const productsWithImageUrl = await Promise.all(
         response.data.products.map(async (product) => {
           const imgResponse = await axios.get(
-            `http://localhost:5000/api/product/${product._id}/image`,
+            `https://college-bookmart.onrender.com/api/product/${product._id}/image`,
             { responseType: 'blob' }
           );
           const imageUrl = URL.createObjectURL(imgResponse.data);
@@ -390,7 +390,7 @@ const ProductGrid = () => {
         console.error('Authorization token not found');
         return;
       }
-      await axios.post('http://localhost:5000/api/product/', formData, {
+      await axios.post('https://college-bookmart.onrender.com/api/product/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`
@@ -424,7 +424,7 @@ const ProductGrid = () => {
         console.error('Authorization token not found');
         return;
       }
-      await axios.patch(`http://localhost:5000/api/product/${editingProduct._id}/quantity`, updatedProduct, {
+      await axios.patch(`https://college-bookmart.onrender.com/api/product/${editingProduct._id}/quantity`, updatedProduct, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -454,7 +454,7 @@ const ProductGrid = () => {
         console.error('Authorization token not found');
         return;
       }
-      await axios.put(`http://localhost:5000/api/product/${editingProduct._id}`, updatedProduct, {
+      await axios.put(`https://college-bookmart.onrender.com/api/product/${editingProduct._id}`, updatedProduct, {
         headers: {
           Authorization: `Bearer ${token}`
         }

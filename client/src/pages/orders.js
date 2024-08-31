@@ -36,7 +36,7 @@ function Order() {
       const token = JSON.parse(sessionStorage.getItem('token'));
       if (token) {
         setLoggedin(true);
-        const response = await axios.get('http://localhost:5000/api/orders/', {
+        const response = await axios.get('https://college-bookmart.onrender.com/api/orders/', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -60,7 +60,7 @@ function Order() {
   const cancelOrder = async (orderId) => {
     try {
       setCancelBtnsClicked((prev) => [...prev, orderId]); 
-      await axios.put(`http://localhost:5000/api/orders/${orderId}/cancel`, {}, {
+      await axios.put(`https://college-bookmart.onrender.com/api/orders/${orderId}/cancel`, {}, {
         headers: {
           Authorization: `Bearer ${JSON.parse(sessionStorage.getItem('token'))}`
         }

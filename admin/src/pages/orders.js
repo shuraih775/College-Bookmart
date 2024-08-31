@@ -49,7 +49,7 @@ function OrderPage() {
   };
   const fetchOrders = useCallback(async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/orders/${statusFilter}`, {
+      const response = await axios.get(`https://college-bookmart.onrender.com/api/orders/${statusFilter}`, {
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('adminToken'))}`
         }
@@ -92,9 +92,9 @@ function OrderPage() {
             console.error('Authorization token not found');
             return;
           }
-      const response = await axios.get(`http://localhost:5000/api/product/available?${queryParams.toString()}`);
+      const response = await axios.get(`https://college-bookmart.onrender.com/api/product/available?${queryParams.toString()}`);
       const productsWithImageUrl = await Promise.all(response.data.products.map(async product => {
-        const imgResponse = await axios.get(`http://localhost:5000/api/product/${product._id}/image`, { responseType: 'blob' });
+        const imgResponse = await axios.get(`https://college-bookmart.onrender.com/api/product/${product._id}/image`, { responseType: 'blob' });
         const imageUrl = URL.createObjectURL(imgResponse.data);
         return { ...product, img: imageUrl };
       }));
@@ -136,7 +136,7 @@ function OrderPage() {
 
     useEffect(() => {
       if (!img) {
-        axios.get(`http://localhost:5000/api/product/${productId}/image`, { responseType: 'blob' }, {
+        axios.get(`https://college-bookmart.onrender.com/api/product/${productId}/image`, { responseType: 'blob' }, {
           headers: {
             Authorization: `Bearer ${JSON.parse(localStorage.getItem('adminToken'))}`
           }
@@ -182,7 +182,7 @@ function OrderPage() {
       };
 
       
-      const response = await axios.post('http://localhost:5000/api/orders/manualOrder', orderData, {
+      const response = await axios.post('https://college-bookmart.onrender.com/api/orders/manualOrder', orderData, {
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('adminToken'))}`
         }
@@ -208,7 +208,7 @@ function OrderPage() {
 
   const markAsComplete = async (orderId) => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/orders/${orderId}/complete`, { code }, {
+      const response = await axios.put(`https://college-bookmart.onrender.com/api/orders/${orderId}/complete`, { code }, {
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('adminToken'))}`
         }
@@ -230,7 +230,7 @@ function OrderPage() {
       const adminToken = JSON.parse(localStorage.getItem('adminToken'));
       console.log(adminToken);
       const response = await axios.put(
-        `http://localhost:5000/api/orders/${orderId}/readytopick`,
+        `https://college-bookmart.onrender.com/api/orders/${orderId}/readytopick`,
         {}, 
         {
           headers: {

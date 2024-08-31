@@ -31,7 +31,7 @@ const PrintoutPage = () => {
     try {
       const token = JSON.parse(sessionStorage.getItem('token'));
       if (token) {
-        const response = await axios.get(`http://localhost:5000/api/upload/user/${statusFilter}`, {
+        const response = await axios.get(`https://college-bookmart.onrender.com/api/upload/user/${statusFilter}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -182,7 +182,7 @@ const PrintoutPage = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/upload/', formData, {
+      const response = await axios.post('https://college-bookmart.onrender.com/api/upload/', formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
