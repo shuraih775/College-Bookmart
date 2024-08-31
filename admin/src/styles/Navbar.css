@@ -1,0 +1,108 @@
+.nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    /* background-color: white; */
+    background-color: rgba(250, 230, 75, 1);
+    /* background-color: rgba(250, 230, 75, 0.877); */
+    /* background-color: rgba(235, 213, 46, 0.823); */
+    /* margin: 1.5rem; */
+    padding: .7rem;
+    /* border: .2rem solid #ccc; */
+    /* width: calc(100% - 6rem); */
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    /* border-bottom: 1px solid black; */
+  }
+  .scrolled-nav{
+    border-bottom: 1px solid black;
+    background-color: rgba(250, 230, 75, 1);
+  }
+  .title {
+    font-size: 1.2rem;
+    color: black;
+    margin-left: 1rem;
+    background-color: rgba(250, 230, 75, 1);
+  }
+  
+  .nav-link {
+    color: black !important;
+    text-decoration: none !important;
+    display: flex !important;
+    align-items: center !important;
+    background-color: rgba(250, 230, 75, 1) !important;
+  }
+  .nav-link p{
+    text-align: center !important;
+    background-color: rgba(250, 230, 75, 1) !important;
+    
+  } 
+  .nav-block Link{
+    align-items: center !important;
+    align-content: center !important;
+    text-align: end;
+    background-color: rgba(250, 230, 75, 1) !important;
+    /* padding: .2rem; */
+  }
+  .nav-block{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .nav-icon{
+    align-items: center !important;
+    align-content: center !important;
+    justify-content: center !important;
+    align-self: center !important;
+    padding-bottom: .3rem;
+    padding-left: .3rem;
+    background-color: rgba(250, 230, 75, 1) !important;
+  }
+  .nav-links{
+    background-color: rgba(250, 230, 75, 1) !important; 
+  }
+  
+  .nav-link:hover {
+    color: #456859 !important;
+  }
+  
+  .nav-container {
+    background-color: rgba(250, 230, 75, 1) !important; 
+  }
+  
+  .menu-button {
+    display: none;
+    background: none;
+    border: none;
+    /* color: #ccc; */
+    background-color: rgba(250, 230, 75, 1);
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  
+  .nav-links {
+    display: flex;
+    gap: 1rem;
+    background-color: rgba(250, 230, 75, 1) !important;
+  }
+  
+  .nav-links.expanded {
+    display: block;
+  }
+  @media (max-width: 768px) {
+    .nav{
+      width: 100%;
+    }
+    .nav-links {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+    }
+  
+    .menu-button {
+      display: block;
+    }
+  }

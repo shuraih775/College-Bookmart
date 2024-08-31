@@ -1,0 +1,47 @@
+.total-stat{
+    margin:2rem;
+  }
+  .stationery-stat{
+    margin:2rem;
+  }
+  
+  .printout-stat{
+    margin:2rem;
+  }
+  .stationery-stat p, .printout-stat p{
+    font-size: 1.5rem;
+  }
+
+.statistics-container {
+  font-size: 0.9rem;
+  padding: 20px;
+}
+
+.statistics-header {
+  margin-bottom: 20px;
+}
+
+.form-inline .form-group {
+  margin-right: 20px;
+}
+
+.table-container {
+  margin-top: 20px;
+}
+
+.table-header {
+  font-weight: bold;
+}
+
+button.fetch-button {
+  background-color: #007bff;
+  color: #fff;
+}
+
+button.fetch-button:hover {
+  background-color: #0056b3;
+}
+
+.modal-body {
+  overflow-x: auto;
+}  

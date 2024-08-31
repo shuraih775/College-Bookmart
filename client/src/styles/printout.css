@@ -1,0 +1,215 @@
+.print-main-div{
+    margin-top: 1rem;
+  }
+  .print-div div{
+    
+    display: flex;
+
+  }
+  .print-div div {
+    width: 60%;
+    justify-content: left;
+  }
+  #print-label{
+    width: 40%;
+  }
+  .print-div div div{
+    width: 50%;
+  }
+  .print-div div div label{
+    width: auto;
+  }
+  .print-div{
+    margin-bottom: 15px;
+  }
+  
+  .print-div label {
+    display: block;
+    /* font-weight: bold; */
+    margin-bottom: 5px;
+    justify-content: left;
+    align-self: left;
+    justify-self: left;
+    text-align: center;
+    align-content: center;
+  }
+  /* .print-radio-div, .print-radio-div label{
+    margin-right: 8rem;
+  } */
+  
+  
+  
+  .print-div select{
+    margin-right: 56.6%;
+  }
+  
+  .num-copies-input,
+  .extra-instructions-input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+  
+  .extra-instructions-input {
+    height: 100px;
+    resize: vertical;
+  }
+  .print-detail-div {
+    margin: 20px 0;
+  }
+  
+  .print-details {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .dept-div {
+    margin-bottom: 15px;
+  }
+  
+  .dept-div label {
+    display: block;
+    /* font-weight: bold; */
+    margin-bottom: 5px;
+  }
+  
+  .dept-div select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+  .upload {
+    margin-top: 10px;
+    max-width: auto;
+  }
+  .print-detail-div{
+    display: flex;
+    justify-content: space-around;
+  }
+  .print-details,.print-details p, .print-details div{
+    font-size: medium;
+  }
+  
+  
+  .print-details{
+    margin: .2rem;
+  }
+  .print-div{
+    display: flex;
+    margin-top: .3rem;
+    
+  }
+  .print-div input{
+    margin-right: .1rem;
+    justify-content:left;
+    
+  }
+  .print-div label{
+    width:40%;
+    justify-content:left;
+    text-align: left;
+    cursor: pointer;
+  }
+  
+  .dept-div{
+    display: flex;
+    align-items: center;
+  }
+  .dept-div label{
+    text-align: left;
+    width: 33.3%;
+  }
+  .dept-div select{
+    width:60%;
+    margin-bottom: .5rem;
+  }  
+  .loader-cart {
+    /* margin-left: 20%; */
+    border: 2px solid transparent;
+    border-top: 2px solid #222222;
+    border-right: 2px solid #222222;
+    border-bottom: 2px solid #222222;
+    border-left: 2px solid transparent;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+.btn-pending {
+  margin-right: 0.2rem;
+  width: 7rem; 
+}
+
+.btn-ready {
+  width: 11rem; 
+}
+
+.print-details div {
+  display: flex;
+}
+.print-details div p{
+  width: 30%;
+  text-align: left;
+  white-space: nowrap;       /* Prevents text from wrapping to the next line */
+  overflow: hidden;        
+  text-overflow: ellipsis;   
+  width: 30ch; 
+}
+
+
+  @media screen and (max-width: 480px) {
+    .modal-btn{
+      font-size: .7rem;
+    }
+    .print-radio-div, .print-radio-div label{
+      margin-right: 5rem;
+      font-size: .55rem;
+    }
+    .btn-pending {
+      margin-right: 0.1rem; 
+      width: 6rem; 
+    }
+  
+    .btn-ready {
+      width: 10rem; 
+    }
+    .print-details,.print-details p, .print-details div{
+      font-size: .8rem;
+    }
+    /* .print-div label,.print-div select {
+      font-size: .8rem;
+    } */
+    .print-div select{
+      height: 2rem;
+      /* width :8rem; */
+      margin-right: auto;
+    }
+    .num-copies input,.print-div textarea{
+      height: 2rem;
+      width :8rem;
+    }
+    .title {
+      font-size: 1rem;
+      text-align: center;
+      align-content: center
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+
+  }

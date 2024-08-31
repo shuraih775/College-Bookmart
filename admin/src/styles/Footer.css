@@ -1,0 +1,17 @@
+.Footer-container{
+    align-items: center;
+    margin-top: auto;
+  }
+  .Footer{
+    height: 100%;
+    background-color: rgba(250, 230, 75, 1);
+    border: 1px solid black;
+    padding: .6rem;
+    /* margin: .6rem .9rem .6rem .9rem;
+    border-radius: 1rem; */
+    /* position: fixed; */
+  }
+  .Footer p{
+    margin: .6rem;
+    text-align: center;
+  }

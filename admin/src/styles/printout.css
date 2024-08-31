@@ -1,0 +1,49 @@
+/* .btn-1{
+    padding: .2rem;
+    width: auto;
+} */
+
+.btn-2 .fileName{
+    white-space: nowrap;       /* Prevents text from wrapping to the next line */
+  overflow: hidden;        
+  text-overflow: ellipsis;  
+  width: 35ch;
+  font-size: .7rem !important;
+}
+
+.fileName{
+    white-space: nowrap;       /* Prevents text from wrapping to the next line */
+  overflow: hidden;        
+  text-overflow: ellipsis;  
+  width: 40ch;
+  font-size: 1rem !important;
+  
+}
+
+.printout-item .btn-2{
+    padding: .2rem .8rem ;
+    
+}
+
+.printout-item{
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    margin-top: .5rem;
+}
+
+@media screen and (max-width: 768px) {
+
+    .fileName{
+          
+      width: 30ch;
+      font-size: .8rem !important;
+      
+    }
+    .btn-2 .fileName{
+       
+      width: 30ch;
+      font-size: .7rem !important;
+    }
+}

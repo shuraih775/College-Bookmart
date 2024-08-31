@@ -1,0 +1,30 @@
+.popup-success .modal-content {
+    border: 2px solid #28a745;
+  }
+  
+  .popup-error .modal-content {
+    border: 2px solid #dc3545;
+  }
+  
+  .popup-body {
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .popup-icon {
+    font-size: 2em;
+    margin-bottom: 10px;
+  }
+  
+  .green-tick {
+    color: #28a745;
+  }
+  
+  .red-exclamation {
+    color: #dc3545;
+  }
+  
+  .popup-message {
+    font-size: 1.2em;
+  }
+  
