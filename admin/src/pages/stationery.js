@@ -7,7 +7,7 @@ import Loading from './Loading';
 
 
 const ProductGrid = () => {
-  const debounceTimeout = useRef(null);
+  // const debounceTimeout = useRef(null);
   const nameref = useRef(null);
   const imgref = useRef(null);
   const buyingpriceref = useRef(null);
@@ -35,6 +35,7 @@ const ProductGrid = () => {
     subtypes: {}
   });
   const[loading, setLoading] = useState(false);
+  const [fetchedAll, setFetchedAll] = useState(0);
 
 
 
@@ -61,8 +62,9 @@ const ProductGrid = () => {
 
   ];
 
-  const fetchProducts = useCallback(async (filter,term, currPage, productsPerPage = parseInt(windowWidth / 180 * 4)) => {
+  const fetchProducts = useCallback(async (filter,term, currPage, donotfetch, productsPerPage = parseInt(windowWidth / 180 * 4)) => {
     try {
+      const doNotFetch = donotfetch || fetchedAll;
       // console.log(productsPerPage);
       const Page = currPage || page;
       console.log(Page,currPage);
@@ -70,7 +72,9 @@ const ProductGrid = () => {
         return;
       }
       fetchedProductsPage.current = Page;
-      
+      if(doNotFetch === 1){
+        return;
+      }
       
       setLoading(true);
       const filters = filter || appliedFilters;
@@ -105,6 +109,12 @@ const ProductGrid = () => {
         })
       );
       console.log(filters,term)
+      if(productsWithImageUrl.length === 0){
+        setFetchedAll(1);
+      }      
+      else{
+        setFetchedAll(0);
+      }
       
       setProducts(products=>{return [...products, ...productsWithImageUrl]});
       setLoading(false);
@@ -116,7 +126,7 @@ const ProductGrid = () => {
       setLoading(false);
       console.error('Error fetching products:', error);
     }
-  }, [appliedFilters,page,searchTerm,windowWidth]);
+  }, [appliedFilters,page,searchTerm,windowWidth,fetchedAll]);
   
   useEffect(() => {
     fetchProducts();
@@ -178,33 +188,35 @@ const ProductGrid = () => {
   // };
 
 
-  useEffect(() => {
-    // Clear the timeout if `fetchProducts` is called again within the debounce period
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
-    }
+  // useEffect(() => {
+  //   // Clear the timeout if `fetchProducts` is called again within the debounce period
+  //   if (debounceTimeout.current) {
+  //     clearTimeout(debounceTimeout.current);
+  //   }
 
-    // Set a timeout to delay the fetchProducts call
-    debounceTimeout.current = setTimeout(() => {
-      fetchProducts();
-    }, 300); // Adjust the debounce delay as needed
+  //   // Set a timeout to delay the fetchProducts call
+  //   debounceTimeout.current = setTimeout(() => {
+  //     fetchProducts();
+  //   }, 300); // Adjust the debounce delay as needed
 
-    // Cleanup function to clear the timeout on unmount
-    return () => {
-      if (debounceTimeout.current) {
-        clearTimeout(debounceTimeout.current);
-      }
-    };
-  }, [fetchProducts]);
+  //   // Cleanup function to clear the timeout on unmount
+  //   return () => {
+  //     if (debounceTimeout.current) {
+  //       clearTimeout(debounceTimeout.current);
+  //     }
+  //   };
+  // }, [fetchProducts]);
 
   const handleApplyFilters = () => {
     setPage(1);
+    setFetchedAll(0);
+    
     fetchedProductsPage.current = 0;
     console.log(selectedType,selectedSubTypes)
     setAppliedFilters({ type: selectedType, subtypes: selectedSubTypes });
     setProducts([]);
     // filteredProducts.current = [];
-    fetchProducts({ type: selectedType, subtypes: selectedSubTypes });
+    fetchProducts({ type: selectedType, subtypes: selectedSubTypes },undefined,undefined,0);
     setShowFilters(false);
     
   };
@@ -212,6 +224,7 @@ const ProductGrid = () => {
 
   const handleResetFilters = () => {
     setPage(1);
+    setFetchedAll(0);
     fetchedProductsPage.current = 0;
     setProducts([]);
     // filteredProducts.current = [];
@@ -222,11 +235,12 @@ const ProductGrid = () => {
     setIntermediateSearchTerm('');
     setAppliedFilters({ type: 'all', subtypes: {} });
     setShowFilters(false);
-    fetchProducts();
+    fetchProducts(undefined,undefined,undefined,0);
     
   };
 
   const handleSearch = () => {
+    setFetchedAll(0);
     setProducts([]);
     // filteredProducts.current = [];
     setPage(1);
@@ -234,11 +248,11 @@ const ProductGrid = () => {
     if (searchIntermediateTerm.trim() === '') {
       // Reset the search term and fetch all products
       setSearchTerm('');
-      fetchProducts(undefined, '');
+      fetchProducts(undefined, '',undefined,0);
     } else {
       // Apply the search term and fetch products
       setSearchTerm(searchIntermediateTerm.trim());
-      fetchProducts(appliedFilters, searchIntermediateTerm.trim());
+      fetchProducts(appliedFilters, searchIntermediateTerm.trim(),undefined,0);
     }
     
   };

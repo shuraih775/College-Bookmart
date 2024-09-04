@@ -12,7 +12,7 @@ import '../styles/stationery.css';
 
 function StationeryPage() {
   // const [products, setProducts] = useState([]);
-  const debounceTimeout = useRef(null);
+  // const debounceTimeout = useRef(null);
   const [showPopup, setShowPopup] = useState(false);
   const [status, setStatus] = useState(false);
   const [msg, setMsg] = useState("");
@@ -34,6 +34,7 @@ function StationeryPage() {
   const fetchedProductsPage = useRef(0);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+  const [fetchedAll, setFetchedAll] = useState(0);
 
   const navigate = useNavigate();
 
@@ -61,16 +62,19 @@ function StationeryPage() {
 
 
 
-  const fetchProducts = useCallback(async (filter,term, currPage, productsPerPage = parseInt(windowWidth / 180 * 4)) => {
+  const fetchProducts = useCallback(async (filter,term, currPage,donotfetch, productsPerPage = parseInt(windowWidth / 180 * 4)) => {
     try {
       // console.log(productsPerPage);
+      const doNotFetch = donotfetch || fetchedAll;
       const Page = currPage || page;
       console.log(Page,currPage);
       if (fetchedProductsPage.current >= Page) {
         return;
       }
       fetchedProductsPage.current = Page;
-      
+      if(doNotFetch === 1){
+        return;
+      }
       setLoading(true);
   
       const filters = filter || appliedFilters;
@@ -95,8 +99,13 @@ function StationeryPage() {
           return { ...product, img: imageUrl };
         })
       );
-      console.log(filters,term)
-      
+      console.log(productsWithImageUrl)
+      if(productsWithImageUrl.length === 0){
+        setFetchedAll(1);
+      }      
+      else{
+        setFetchedAll(0);
+      }
       setFilteredProducts(filteredProducts=>{return [...filteredProducts, ...productsWithImageUrl]});
       // filteredProducts.current = [...filteredProducts.current, ...productsWithImageUrl];
       
@@ -109,8 +118,9 @@ function StationeryPage() {
       setShowPopup(true);
       console.error('Error fetching products:', error);
     }
-  }, [appliedFilters, page, searchTerm, windowWidth]);
+  }, [appliedFilters, page, searchTerm, windowWidth,fetchedAll]);
   
+
   useEffect(() => {
     const handleScroll = () => {
       const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
@@ -154,32 +164,33 @@ function StationeryPage() {
 
   useEffect(() => {
     // Clear the timeout if `fetchProducts` is called again within the debounce period
-    if (debounceTimeout.current) {
-      clearTimeout(debounceTimeout.current);
-    }
+    // if (debounceTimeout.current) {
+    //   clearTimeout(debounceTimeout.current);
+    // }
 
-    // Set a timeout to delay the fetchProducts call
-    debounceTimeout.current = setTimeout(() => {
+    // // Set a timeout to delay the fetchProducts call
+    // debounceTimeout.current = setTimeout(() => {
       fetchProducts();
-    }, 300); // Adjust the debounce delay as needed
+    // }, 300); // Adjust the debounce delay as needed
 
-    // Cleanup function to clear the timeout on unmount
-    return () => {
-      if (debounceTimeout.current) {
-        clearTimeout(debounceTimeout.current);
-      }
-    };
+    // // Cleanup function to clear the timeout on unmount
+    // return () => {
+    //   if (debounceTimeout.current) {
+    //     clearTimeout(debounceTimeout.current);
+    //   }
+    // };
   }, [fetchProducts]);
 
 
   const handleApplyFilters = () => {
     setPage(1);
+    setFetchedAll(0);
     fetchedProductsPage.current = 0;
     console.log(selectedType,selectedSubTypes)
     setAppliedFilters({ type: selectedType, subtypes: selectedSubTypes });
     setFilteredProducts([]);
     // filteredProducts.current = [];
-    fetchProducts({ type: selectedType, subtypes: selectedSubTypes });
+    fetchProducts({ type: selectedType, subtypes: selectedSubTypes },undefined,undefined,0);
     setShowFilters(false);
     
   };
@@ -187,6 +198,7 @@ function StationeryPage() {
 
   const handleResetFilters = () => {
     setPage(1);
+    setFetchedAll(0);
     fetchedProductsPage.current = 0;
     setFilteredProducts([]);
     // filteredProducts.current = [];
@@ -197,12 +209,13 @@ function StationeryPage() {
     setIntermediateSearchTerm('');
     setAppliedFilters({ type: 'all', subtypes: {} });
     setShowFilters(false);
-    fetchProducts();
+    fetchProducts(undefined,undefined,undefined,0);
     
   };
   
 
   const handleSearch = () => {
+    setFetchedAll(0);
     setFilteredProducts([]);
     // filteredProducts.current = [];
     setPage(1);
@@ -210,11 +223,11 @@ function StationeryPage() {
     if (searchIntermediateTerm.trim() === '') {
       // Reset the search term and fetch all products
       setSearchTerm('');
-      fetchProducts(undefined, '');
+      fetchProducts(undefined, '',undefined,0);
     } else {
       // Apply the search term and fetch products
       setSearchTerm(searchIntermediateTerm.trim());
-      fetchProducts(appliedFilters, searchIntermediateTerm.trim());
+      fetchProducts(appliedFilters, searchIntermediateTerm.trim(),undefined,0);
     }
     
   };
