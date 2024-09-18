@@ -62,9 +62,10 @@ const ProductGrid = () => {
 
   ];
 
-  const fetchProducts = useCallback(async (filter,term, currPage, donotfetch, productsPerPage = parseInt(windowWidth / 180 * 4)) => {
+  const fetchProducts = useCallback(async (filter,term, currPage, productsPerPage = parseInt(windowWidth / 180 * 4)) => {
     try {
-      const doNotFetch = donotfetch || fetchedAll;
+      
+      const doNotFetch = fetchedAll;
       // console.log(productsPerPage);
       const Page = currPage || page;
       console.log(Page,currPage);
@@ -72,7 +73,7 @@ const ProductGrid = () => {
         return;
       }
       fetchedProductsPage.current = Page;
-      if(doNotFetch === 1){
+      if(doNotFetch){
         return;
       }
       
@@ -216,7 +217,7 @@ const ProductGrid = () => {
     setAppliedFilters({ type: selectedType, subtypes: selectedSubTypes });
     setProducts([]);
     // filteredProducts.current = [];
-    fetchProducts({ type: selectedType, subtypes: selectedSubTypes },undefined,undefined,0);
+    fetchProducts({ type: selectedType, subtypes: selectedSubTypes });
     setShowFilters(false);
     
   };
@@ -235,7 +236,7 @@ const ProductGrid = () => {
     setIntermediateSearchTerm('');
     setAppliedFilters({ type: 'all', subtypes: {} });
     setShowFilters(false);
-    fetchProducts(undefined,undefined,undefined,0);
+    fetchProducts();
     
   };
 
@@ -248,11 +249,11 @@ const ProductGrid = () => {
     if (searchIntermediateTerm.trim() === '') {
       // Reset the search term and fetch all products
       setSearchTerm('');
-      fetchProducts(undefined, '',undefined,0);
+      fetchProducts(undefined, '');
     } else {
       // Apply the search term and fetch products
       setSearchTerm(searchIntermediateTerm.trim());
-      fetchProducts(appliedFilters, searchIntermediateTerm.trim(),undefined,0);
+      fetchProducts(appliedFilters, searchIntermediateTerm.trim());
     }
     
   };

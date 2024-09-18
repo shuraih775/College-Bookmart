@@ -113,7 +113,7 @@ const productController = {
       const limit = parseInt(req.query.limit) || 10;
       const skip = (page - 1) * limit;
       
-      console.log(skip,limit);
+      // console.log(skip,limit);
       const { type, subtypes } = JSON.parse(req.query.filters);
       const searchTerm = req.query.searchName;
       // console.log(req.query);
@@ -137,14 +137,14 @@ const productController = {
           }
         }
       }
-  
+      console.log(filters);
       // Fetch the filtered products with pagination
       const products = await Product.find(filters)
         .skip(skip)
         .limit(limit);
   
       const totalProducts = await Product.countDocuments(filters);
-      console.log(totalProducts,filters,type);
+      // console.log(totalProducts,filters,type);
       res.status(200).json({
         page,
         totalPages: Math.ceil(totalProducts / limit),
@@ -168,7 +168,7 @@ const productController = {
       const limit = parseInt(req.query.limit) || 10;
       const skip = (page - 1) * limit;
       
-      console.log(skip,limit);
+      // console.log(skip,limit);
       const { type, subtypes } = JSON.parse(req.query.filters);
       const searchTerm = req.query.searchName;
       // console.log(req.query);
@@ -192,14 +192,14 @@ const productController = {
           }
         }
       }
-  
+      console.log(filters);
       // Fetch the filtered products with pagination
       const products = await Product.find(filters)
         .skip(skip)
         .limit(limit);
   
       const totalProducts = await Product.countDocuments(filters);
-      console.log(totalProducts,filters,type);
+      // console.log(totalProducts,filters,type);
       res.status(200).json({
         page,
         totalPages: Math.ceil(totalProducts / limit),

@@ -42,7 +42,7 @@ function StationeryPage() {
    
     {"InkType":["Ball","Gel"]},
     {"Color":["Red","Blue","Green","Black"]},
-    {"Pencil Type":["Mechanical","Graphite"]},
+    {"PencilType":["Mechanical","Graphite"]},
     {"Grade":["2B","3B","HB"]},
     {"Lead Size":[".7mm",".9mm"]},
     {"Ruler Type":["Plastic","Steel"]},
@@ -52,27 +52,27 @@ function StationeryPage() {
   const types = ["Pen","Pencil","Ruler","Eraser","Sharpner","Whitener"];
   const typeDependencies = [
     {"Pen":["InkType","Color"]},
-    {"Pencil":["Pencil Type"]},
-    {"Pencil Type":["Mechanical","Graphite"]},
-    {"Mechanical":["Grade"]},
-    {"Graphite":["Lead Size"]},
+    {"Pencil":["PencilType"]},
+    {"PencilType":["Mechanical","Graphite"]},
+    {"Mechanical":["Lead Size"]},
+    {"Graphite":["Grade"]},
     {"Ruler":["Ruler Type","Ruler Length"]},
 
   ];
 
 
 
-  const fetchProducts = useCallback(async (filter,term, currPage,donotfetch, productsPerPage = parseInt(windowWidth / 180 * 4)) => {
+  const fetchProducts = useCallback(async (filter,term, currPage, productsPerPage = parseInt(windowWidth / 180 * 4)) => {
     try {
       // console.log(productsPerPage);
-      const doNotFetch = donotfetch || fetchedAll;
+      const doNotFetch = fetchedAll;
       const Page = currPage || page;
-      console.log(Page,currPage);
+      // console.log(donotfetch);
       if (fetchedProductsPage.current >= Page) {
         return;
       }
       fetchedProductsPage.current = Page;
-      if(doNotFetch === 1){
+      if(doNotFetch){
         return;
       }
       setLoading(true);
@@ -86,7 +86,7 @@ function StationeryPage() {
         filters: JSON.stringify(filters),
       });
   
-      console.log(page, appliedFilters);
+      // console.log(page, appliedFilters);
       const response = await axios.get(`https://college-bookmart.onrender.com/api/product/available?${queryParams.toString()}`);
   
       const productsWithImageUrl = await Promise.all(
@@ -99,7 +99,7 @@ function StationeryPage() {
           return { ...product, img: imageUrl };
         })
       );
-      console.log(productsWithImageUrl)
+      // console.log(productsWithImageUrl)
       if(productsWithImageUrl.length === 0){
         setFetchedAll(1);
       }      
@@ -186,11 +186,11 @@ function StationeryPage() {
     setPage(1);
     setFetchedAll(0);
     fetchedProductsPage.current = 0;
-    console.log(selectedType,selectedSubTypes)
+    // console.log(selectedType,selectedSubTypes)
     setAppliedFilters({ type: selectedType, subtypes: selectedSubTypes });
     setFilteredProducts([]);
     // filteredProducts.current = [];
-    fetchProducts({ type: selectedType, subtypes: selectedSubTypes },undefined,undefined,0);
+    fetchProducts({ type: selectedType, subtypes: selectedSubTypes });
     setShowFilters(false);
     
   };
@@ -209,7 +209,7 @@ function StationeryPage() {
     setIntermediateSearchTerm('');
     setAppliedFilters({ type: 'all', subtypes: {} });
     setShowFilters(false);
-    fetchProducts(undefined,undefined,undefined,0);
+    fetchProducts();
     
   };
   
@@ -223,11 +223,11 @@ function StationeryPage() {
     if (searchIntermediateTerm.trim() === '') {
       // Reset the search term and fetch all products
       setSearchTerm('');
-      fetchProducts(undefined, '',undefined,0);
+      fetchProducts(undefined, '');
     } else {
       // Apply the search term and fetch products
       setSearchTerm(searchIntermediateTerm.trim());
-      fetchProducts(appliedFilters, searchIntermediateTerm.trim(),undefined,0);
+      fetchProducts(appliedFilters, searchIntermediateTerm.trim());
     }
     
   };
