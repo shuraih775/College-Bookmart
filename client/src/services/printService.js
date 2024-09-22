@@ -27,6 +27,6 @@ self.addEventListener('fetch', (event) => {
       localStorage.setItem('files', JSON.stringify(serializedFiles));
     }
   
-    return Response.redirect('/printouts', 303);
+    return Response.redirect('/printout', 303);
   }
   
