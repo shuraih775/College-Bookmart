@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import Popup from './popup';
 import { PDFDocument } from 'pdf-lib';
@@ -7,6 +7,7 @@ import { Modal, Button } from 'react-bootstrap';
 import '../styles/printout.css';
 
 const PrintoutPage = () => {
+  
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
   const [btnClicked, setBtnClicked] = useState(false);
@@ -47,6 +48,8 @@ const PrintoutPage = () => {
 
   useEffect(() => {
     fetchPrintouts();
+    const files = localStorage.getItem('files')
+    fileInputRef.current.files = JSON.parse(files)
   }, [statusFilter, fetchPrintouts]);
 
   const DepartmentDropdown = () => {
@@ -81,6 +84,7 @@ const PrintoutPage = () => {
   };
 
   const handleColorChange = (event) => {
+    console.log(fileInputRef.current.files)
     setSelectedColor(event.target.value);
   };
   const handlePrintModeChange = (event) => {

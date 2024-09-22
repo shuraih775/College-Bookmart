@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useEffect} from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Layout from './components/layout';
 import HomePage from './pages/HomePage';
@@ -13,12 +13,24 @@ import ResetPasswordPage from './pages/resetPassword';
 import DeleteAccountPage from './pages/deleteAccount';
 
 const App = () => {
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/services/printService.js')
+        .then((registration) => {
+          console.log('Service Worker registered with scope:', registration.scope);
+        })
+        .catch((error) => {
+          console.log('Service Worker registration failed:', error);
+        });
+    }
+  }, []); 
+  
   return (
     <BrowserRouter>
       <Layout>
         
         <Routes>
-          <Route exact path="/" element={<HomePage/>} />
+          <Route path="/" element={<HomePage/>} />
           <Route path="/stationery" element={<StationeryPage/>} />
           <Route path="/printout" element={<PrintoutPage/>} />
           <Route path="/cart" element={<CartPage/>} />

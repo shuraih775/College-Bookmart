@@ -33,7 +33,11 @@
       "files": [
         {
           "name": "file",
-          "accept": ["image/*", "video/*", "application/*"]
+          "accept": [
+            "image/jpeg",
+            "image/png",
+            "application/pdf"
+          ]
         }
       ]
     }
