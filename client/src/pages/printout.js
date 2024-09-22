@@ -50,6 +50,7 @@ const PrintoutPage = () => {
     fetchPrintouts();
     const files = localStorage.getItem('files')
     fileInputRef.current.files = JSON.parse(files)
+    console.log(files)
   }, [statusFilter, fetchPrintouts]);
 
   const DepartmentDropdown = () => {
