@@ -13,18 +13,19 @@ async function handleShareTarget(request) {
     for (const [name, value] of formData.entries()) {
       if (value instanceof File) {
         files.push(value);
+        console.log('Extracted file:', value);  // Log extracted file details
       }
     }
-
+    
     if (files.length > 0) {
       // Convert File objects to JSON-friendly blobs for storage
       const serializedFiles = files.map(file => ({
         name: file.name,
         type: file.type,
         size: file.size,
-        blob: URL.createObjectURL(file)  // Store as blob URL
+        blob: file  // Store file object directly
       }));
-
+      
       // Save the files to IndexedDB
       await saveFilesToIndexedDB(serializedFiles);
     }
