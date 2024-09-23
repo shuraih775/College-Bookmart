@@ -15,7 +15,7 @@ import DeleteAccountPage from './pages/deleteAccount';
 const App = () => {
   useEffect(() => {
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/services/printService.js')
+      navigator.serviceWorker.register('sw.js')
         .then((registration) => {
           console.log('Service Worker registered with scope:', registration.scope);
         })

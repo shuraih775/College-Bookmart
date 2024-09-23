@@ -1,6 +1,5 @@
 self.addEventListener('fetch', (event) => {
   if (event.request.method === 'POST' && event.request.url.endsWith('/share-target')) {
-    alert("hi")
     event.respondWith(handleShareTarget(event.request));
 
   }
