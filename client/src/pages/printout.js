@@ -48,10 +48,63 @@ const PrintoutPage = () => {
 
   useEffect(() => {
     fetchPrintouts();
-    const files = localStorage.getItem('files')
-    fileInputRef.current.files = JSON.parse(files)
-    console.log(files)
+  
+    // Fetch files from IndexedDB
+    async function fetchFilesFromIndexedDB() {
+      const files = await getFilesFromIndexedDB();
+      
+      // If files are retrieved, assign them to the file input
+      if (files && files.length > 0) {
+        // Simulating the files in the file input
+        fileInputRef.current.files = createFileList(files);
+      }
+  
+      console.log(files);
+    }
+  
+    fetchFilesFromIndexedDB();
   }, [statusFilter, fetchPrintouts]);
+  
+  // Function to retrieve files from IndexedDB
+  async function getFilesFromIndexedDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open('fileStorage', 1);
+  
+      request.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction('files', 'readonly');
+        const store = transaction.objectStore('files');
+  
+        const getAllRequest = store.getAll();
+  
+        getAllRequest.onsuccess = () => {
+          resolve(getAllRequest.result);
+        };
+  
+        getAllRequest.onerror = (err) => {
+          console.error('Error fetching files from IndexedDB', err);
+          reject(err);
+        };
+      };
+  
+      request.onerror = (err) => {
+        console.error('IndexedDB error:', err);
+        reject(err);
+      };
+    });
+  }
+  
+  // Helper function to create a FileList from the fetched files
+  function createFileList(files) {
+    const dataTransfer = new DataTransfer();
+    files.forEach(file => {
+      const blob = new Blob([file.blob], { type: file.type });
+      const newFile = new File([blob], file.name, { type: file.type });
+      dataTransfer.items.add(newFile);
+    });
+    return dataTransfer.files;
+  }
+  
 
   const DepartmentDropdown = () => {
     const handleDepartmentChange = (e) => {
