@@ -16,7 +16,7 @@ async function handleShareTarget(request) {
         console.log('Extracted file:', value);  // Log extracted file details
       }
     }
-    
+
     if (files.length > 0) {
       // Convert File objects to JSON-friendly blobs for storage
       const serializedFiles = files.map(file => ({
@@ -25,12 +25,17 @@ async function handleShareTarget(request) {
         size: file.size,
         blob: file  // Store file object directly
       }));
-      
-      // Save the files to IndexedDB
-      await saveFilesToIndexedDB(serializedFiles);
+
+      // Save the files to IndexedDB and handle errors within saveFilesToIndexedDB
+      try {
+        await saveFilesToIndexedDB(serializedFiles);
+      } catch (dbError) {
+        console.error('Database error:', dbError);
+        return new Response('Error saving files to IndexedDB', { status: 500 });
+      }
     }
 
-    // Redirect to the homepage
+    // Redirect to the homepage after successful operation
     return Response.redirect('/', 303);
   } catch (error) {
     console.error('Error handling share target:', error);
@@ -38,7 +43,7 @@ async function handleShareTarget(request) {
   }
 }
 
-// Function to save files to IndexedDB
+// Function to save files to IndexedDB with error handling
 async function saveFilesToIndexedDB(files) {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open('fileStorage', 1);
@@ -65,14 +70,14 @@ async function saveFilesToIndexedDB(files) {
       };
 
       transaction.onerror = (err) => {
-        console.error('Error saving files to IndexedDB', err);
-        reject(err);
+        console.error('Transaction error:', err);
+        reject(new Error('Transaction error while saving files to IndexedDB'));
       };
     };
 
     request.onerror = (err) => {
-      console.error('IndexedDB error:', err);
-      reject(err);
+      console.error('IndexedDB open error:', err);
+      reject(new Error('Error opening IndexedDB'));
     };
   });
 }
