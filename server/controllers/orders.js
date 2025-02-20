@@ -1,4 +1,6 @@
+require('dotenv').config();
 const Order = require('../models/orders');
+const Transaction = require('../models/transactions');
 const Product = require('../models/products');
 const User = require('../models/users');
 const ActivityLog = require('../models/activityLog');
@@ -6,20 +8,21 @@ const { getUsername,getUserId } = require('./getusername.js');
 const otpGenerator = require('otp-generator');
 const nodemailer = require('nodemailer');
 const { default: mongoose } = require('mongoose');
-
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: process.env.EMAIL_SERVICE,
   auth: {
-    user: 'shuraihshaikh.cs22@bmsce.ac.in',
-    pass: '763513rakshitanhihai'
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   }
 });
 const orderController = {
   createOrder: async (req, res) => {
     try {
       
-     
+      
       const orderItems = req.body.items;
       // const billAmount = req.body.totalAmount;
       
@@ -34,11 +37,13 @@ const orderController = {
         return res.status(401).json({ message: 'User not logged in' });
       }
 
-      const username = await getUsername(token);
-      if (!username) {
+      const userId = await getUserId(token);
+      if (!userId) {
         return res.status(401).json({ message: 'Invalid token' });
       }
-      
+      const user = await User.findById(userId);
+      const username = user.username;
+      const email = user.email;
      
 
       let totalAmount = 0;
@@ -56,7 +61,93 @@ const orderController = {
           orderedProduct.subtypes = product.subtypes;
         }
       }
+      var instance = new Razorpay({ key_id: 'rzp_live_MWPX9UNMwzB4Qq', key_secret: 'EqPwegqdzkBek2WYr1ZD5YaX' })
 
+     const order = await instance.orders.create({
+      amount: totalAmount * 100,
+      currency: "INR",
+      receipt: "receipt#1",
+      
+      // notes: {
+      //     key1: "value3",
+      //     key2: "value2"
+      // }
+      })
+
+      const newOrder = new Order({
+        _id: order.id,
+        username,
+        order_items: orderItems,
+        bill_amt: totalAmount,
+        status:"PaymentIncomplete"
+      });
+      // console.log(orderItems);
+      console.log(9);
+      await newOrder.save();
+      if(!order){
+        return res.status(500).send("Error"); 
+      }
+      console.log(order)
+      return res.status(201).json(order)
+
+      
+      
+
+      
+
+       
+      
+      
+      // console.log(user);
+      
+    } catch (error) {
+      console.log(error);
+      
+      res.status(500).json({ success: false, message: 'Failed to create order' });
+    }
+  },
+  confirmOrder : async(req,res) =>{
+    try{
+      const authHeader = req.headers.authorization;
+      if (!authHeader) {
+        return res.status(401).json({ message: 'User not logged in' });
+      }
+
+      const tokenArray = authHeader.split(' ');
+      const token = tokenArray[1];
+      if (!token) {
+        return res.status(401).json({ message: 'User not logged in' });
+      }
+
+      const userId = await getUserId(token);
+      const user = await User.findById(userId);
+      const email = user.email;
+      if (!userId) {
+        return res.status(401).json({ message: 'Invalid token' });
+      }
+      const orderId  = req.body.orderId;
+      const paymentId  = req.body.paymentId;
+      const signature  = req.body.signature;
+
+      function generateHMAC(message, secret) {
+        const hmac = crypto.createHmac('sha256', secret);
+        hmac.update(message);
+        return hmac.digest('hex');
+    }
+    const msg = orderId+"|"+paymentId
+    const generatedSignature = generateHMAC(msg, 'EqPwegqdzkBek2WYr1ZD5YaX')
+
+    if (generatedSignature === signature){
+      
+      const order  = await Order.findById(orderId);
+      const transaction = new Transaction({
+        transactionId:paymentId,
+        orderId,
+        bill_amt:order.bill_amt,
+        transactionFor:'Stationery'
+      })
+      await transaction.save();
+      const orderItems = order.order_items;
       orderItems.map( async(orderedProduct)=>{
         
         const product = await Product.findByIdAndUpdate(orderedProduct._id);
@@ -77,44 +168,36 @@ const orderController = {
 
       });
 
-      
-
-       
-      
-      const user = await User.findOne({username});
-      const email = user.email;
-      // console.log(user);
       const code = otpGenerator.generate(6, { digits: true, alphabets: false, upperCase: false, specialChars: false });
-      const mailOptions = {
-        from: 'shuraihshaikh.cs22@bmsce.ac.in',
-        to: email,
-        subject: 'Code for Order Pickup',
-        text: `Provide with this code when asked while recieving the order: ${code}`
-      };
-      transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.log('Error sending email:', error);
-          return res.status(500).json({ message: 'Error sending OTP email' });
-        }
-        res.status(201).json({ message: 'OTP sent to email, please verify' });
-    });
+    //   const mailOptions = {
+    //     from: 'shuraihshaikh.cs22@bmsce.ac.in',
+    //     to: email,
+    //     subject: 'Code for Order Pickup',
+    //     text: `Provide with this code when asked while recieving the order: ${code}`
+    //   };
+    //   transporter.sendMail(mailOptions, (error, info) => { 
+    //     if (error) {
+    //       console.log('Error sending email:', error);
+    //       return res.status(500).json({ message: 'Error sending OTP email' });
+    //     }
 
-    const newOrder = new Order({
-      username,
-      order_items: orderItems,
-      bill_amt: totalAmount,
-      code:code
-    });
-    // console.log(orderItems);
-    
-    await newOrder.save();
+    //     // res.status(200).json({ message: 'OTP sent to email, please verify' });
+    // });
+    order.code = code;
+    order.status = "pending";
+    await order.save();
+
+      res.status(200).json({ success: true, message: 'Order created successfully', order });
+    }
+    else{
+      res.status(400).json({message:'payment could not be verified'})
+    }
 
       
-      res.status(201).json({ success: true, message: 'Order created successfully', order: newOrder });
-    } catch (error) {
-      console.log(error);
-      
-      res.status(500).json({ success: false, message: 'Failed to create order' });
+    }
+    catch(error){
+      console.error(error)
+      res.status(500).json({message:"Internal Server Error"});
     }
   },
   createManualOrder: async(req,res) =>{
@@ -136,9 +219,20 @@ const orderController = {
         const orderItems = req.body.order_items;
       const billAmount = req.body.bill_amt;
 
-   
+      function generateRandomObjectId() {
+        const hexChars = '0123456789abcdef';
+        let objectId = '';
+        for (let i = 0; i < 24; i++) {
+            const randomIndex = Math.floor(Math.random() * hexChars.length);
+            objectId += hexChars[randomIndex];
+        }
+        return objectId;
+    }
+  
+   const _id = generateRandomObjectId()
 
       const newOrder = new Order({
+        _id,
         username:'admin',
         order_items: orderItems,
         bill_amt: billAmount,

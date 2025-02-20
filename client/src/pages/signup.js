@@ -44,7 +44,7 @@ const SignUpForm = () => {
       setShowPopup(true);
         return;
         }
-      const response = await axios.post('https://college-bookmart.onrender.com/api/auth/send-otp', { email, username});
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/send-otp`, { email, username});
       
       if (response.status === 201) {
         setOtpSent(true);
@@ -97,7 +97,7 @@ const SignUpForm = () => {
       setShowPopup(true);
         return;
         }
-      const response = await axios.post('https://college-bookmart.onrender.com/api/auth/signup', {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/signup`, {
         email,
         username,
         password,
@@ -147,7 +147,7 @@ const SignUpForm = () => {
 
   const handleVpaSubmit = async () => {
     try {
-      const response = await axios.post('https://college-bookmart.onrender.com/api/auth/vpa', { email, vpa });
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/vpa`, { email, vpa });
       if (response.status === 200) {
         setShowVpaModal(false);
         navigate('/login');

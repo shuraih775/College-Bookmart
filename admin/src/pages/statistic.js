@@ -18,7 +18,7 @@ const Statistics = () => {
 
   const fetchStatistics = useCallback(async () => {
     try {
-      let response = await axios.get('https://college-bookmart.onrender.com/api/upload/statistics', {
+      let response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/upload/statistics`, {
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('adminToken'))}`
         },
@@ -28,7 +28,7 @@ const Statistics = () => {
       setPrintTotalProfit(response.data.totalProfit);
       setPrintTotalRevenue(response.data.totalRevenue);
       
-      response = await axios.get('https://college-bookmart.onrender.com/api/product/statistics',  {
+      response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/product/statistics`,  {
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('adminToken'))}`
         }

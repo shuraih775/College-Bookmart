@@ -11,6 +11,7 @@ const upload = multer({ storage: storage });
 
 
 router.post('/',upload.none(), orderController.createOrder);
+router.post('/confirm', orderController.confirmOrder);
 router.post('/manualOrder',upload.none(), orderController.createManualOrder);
 router.get('/',orderController.retrieve);
 router.get('/:status',orderController.retrieveAll);

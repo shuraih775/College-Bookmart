@@ -87,12 +87,12 @@ function StationeryPage() {
       });
   
       // console.log(page, appliedFilters);
-      const response = await axios.get(`https://college-bookmart.onrender.com/api/product/available?${queryParams.toString()}`);
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/product/available?${queryParams.toString()}`);
   
       const productsWithImageUrl = await Promise.all(
         response.data.products.map(async (product) => {
           const imgResponse = await axios.get(
-            `https://college-bookmart.onrender.com/api/product/${product._id}/image`,
+            `${process.env.REACT_APP_BACKEND_URL}/api/product/${product._id}/image`,
             { responseType: 'blob' }
           );
           const imageUrl = URL.createObjectURL(imgResponse.data);
@@ -139,6 +139,7 @@ function StationeryPage() {
   
 
   useEffect(() => {
+    console.log(`${process.env.REACT_APP_BACKEND_URL}`)
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
       setWindowHeight(window.innerHeight);
@@ -286,7 +287,7 @@ function StationeryPage() {
     useEffect(() => {
       if (!img) {
         
-        axios.get(`https://college-bookmart.onrender.com/api/product/${productId}/image`, {
+        axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/product/${productId}/image`, {
             responseType: 'blob',
           })
           .then((response) => {

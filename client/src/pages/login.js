@@ -43,7 +43,7 @@ const LoginForm = () => {
     }
 
     try {
-      const response = await fetch('https://college-bookmart.onrender.com/api/auth/login', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -57,7 +57,7 @@ const LoginForm = () => {
           sessionStorage.setItem('token', JSON.stringify(token));
 
           if (token) {
-            const res = await axios.get('https://college-bookmart.onrender.com/api/auth/fetchusername', {
+            const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/auth/fetchusername`, {
               headers: {
                 Authorization: `Bearer ${token}`
               }

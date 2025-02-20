@@ -5,6 +5,8 @@ import { Button, Form, Modal } from 'react-bootstrap';
 import Popup from './popup';
 import '../styles/orders.css';
 import '../styles/printout.css';
+import qz from 'qz-tray';
+import { PDFDocument } from 'pdf-lib';
 
 function PrintoutPage() {
   const [pdfFiles, setPdfFiles] = useState([]);
@@ -32,9 +34,11 @@ function PrintoutPage() {
     }
   };
 
+
+
   const fetchPdfFiles = useCallback(async () => {
     try {
-      const response = await axios.get('https://college-bookmart.onrender.com/api/upload/', {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/upload/`, {
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('adminToken'))}`
         }
@@ -77,7 +81,7 @@ function PrintoutPage() {
       printout["department"] = department;
       printout["numCopies"] = numCopies;
       printout = JSON.stringify(printout)
-      axios.post('https://college-bookmart.onrender.com/api/upload/manualPrintout',{printout}, {
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/upload/manualPrintout`,{printout}, {
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('adminToken'))}`
         }
@@ -101,7 +105,7 @@ function PrintoutPage() {
   //   try {
   //     const updatedFiles = pdfFiles.filter(parent => parent.id !== parentToRemove.id);
   //     setPdfFiles(updatedFiles);
-  //     const response = await axios.delete(`https://college-bookmart.onrender.com/api/upload/${parentToRemove.id}`, {
+  //     const response = await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/upload/${parentToRemove.id}`, {
   //       headers: {
   //         Authorization: `Bearer ${JSON.parse(localStorage.getItem('adminToken'))}`
   //       }
@@ -114,10 +118,77 @@ function PrintoutPage() {
   //     console.error('Error removing file:', err);
   //   }
   // };
+  async function extractPage(blob) {
+    const existingPdfBytes = blob
 
-  const downloadFile = async (fileId, parentId, fileName) => {
+    // Load a PDFDocument from the existing PDF bytes
+    const pdfDoc = await PDFDocument.load(existingPdfBytes);
+
+    // Create a new PDFDocument
+    const newPdfDoc = await PDFDocument.create();
+
+    // Copy the first 5 pages
+    const pages = await newPdfDoc.copyPages(pdfDoc, [0]);
+    pages.forEach((page) => {
+        newPdfDoc.addPage(page);
+    });
+
+    // Serialize the new PDFDocument to bytes
+    const pdfBytes = await newPdfDoc.save();
+
+    // Return the new PDF as a Blob URL or save it to the file system
+    return new Blob([pdfBytes], { type: 'application/pdf' });
+}
+  const printFile = async (copies, printMode, Color, isReport, fileBlob) => {
     try {
-      const response = await axios.get(`https://college-bookmart.onrender.com/api/upload/${parentId}`, {
+      if (!qz.websocket.isActive()) {
+        await qz.websocket.connect()
+      }
+      // await qz.websocket.disconnect();
+      // await qz.websocket.connect(); // Connect to QZ Tray
+      qz.printers.find().then(printers => {
+        console.log("Available printers:", printers);
+    }).catch(err => {
+        console.error("Error finding printers:", err);
+    });
+      
+      const config = qz.configs.create('Microsoft Print to PDF', {
+        copies: copies, 
+        duplex: printMode === "duplex"?true :false ,  // Enable duplex (back-to-back) printing
+        colorType: Color === 'black and white' ? 'blackwhite':'color' ,  // Set color mode (options: 'color', 'blackwhite')
+        jobName: "Sample PDF Print Job"
+      });
+
+      // Create a base64 encoded PDF from the blob
+      
+      const reader = new FileReader();
+      reader.readAsDataURL(fileBlob);
+      
+      reader.onloadend = async () => {
+        
+        const base64data = reader.result.split(',')[1]; // Get base64 data after the 'data:' prefix
+        const printData = [{
+          type: 'pdf',
+          format: 'base64',
+          data: base64data
+        }];
+        console.log(5)
+        await qz.print(config, printData); // Send the print job
+        await qz.websocket.disconnect(); // Disconnect from QZ Tray after printing
+      };
+    } catch (error) {
+      console.error('Error printing:', error);
+    }
+  };
+  const handlePrintClick = async (copies,printMode, Color, fileId, parentId, fileName) => {
+    const fileBlob = await downloadFile(fileId, parentId, fileName,1);
+    if (fileBlob) {
+      await printFile(copies,printMode, Color,fileBlob); // Send the downloaded file to the printer
+    }
+  };
+  const downloadFile = async (fileId, parentId, fileName,print) => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/upload/${parentId}`, {
         responseType: 'blob',
         params: {
           fileId: fileId
@@ -128,8 +199,8 @@ function PrintoutPage() {
         }
       });
       const blob = response.data;
-
-      const url = window.URL.createObjectURL(blob);
+      if(!print){
+        const url = window.URL.createObjectURL(blob);
 
       const link = document.createElement('a');
       link.href = url;
@@ -140,8 +211,13 @@ function PrintoutPage() {
 
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      }
+      
+
+      return blob; // Return the downloaded file blob for further processing (like printing)
     } catch (error) {
       console.error('Error downloading file:', error);
+      return null;
     }
   };
 
@@ -156,7 +232,7 @@ function PrintoutPage() {
   const markAsComplete = async (parentId) => {
     try {
       console.log(parentId);
-      const response = await axios.put(`https://college-bookmart.onrender.com/api/upload/${parentId}/complete`, { code }, {
+      const response = await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/upload/${parentId}/complete`, { code }, {
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('adminToken'))}`
         }
@@ -176,7 +252,7 @@ function PrintoutPage() {
   const markAsReadyToPick = async (parentId) => {
     try {
       console.log(parentId);
-      const response = await axios.put(`https://college-bookmart.onrender.com/api/upload/${parentId}/readytopick`, {
+      const response = await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/upload/${parentId}/readytopick`, {},{
         headers: {
           Authorization: `Bearer ${JSON.parse(localStorage.getItem('adminToken'))}`
         }
@@ -237,6 +313,9 @@ function PrintoutPage() {
                       
                       <button className='btn-2' onClick={() => downloadFile(file.id, order.id, file.name)}>
                         <p className='fileName'>Download {'\u00A0\u00A0\u00A0\u00A0'} {file.name}</p>
+                      </button>
+                      <button className='btn-2' onClick={() => handlePrintClick(order.copies,order.printMode,order.Color,file.id, order.id, file.name)}>
+                        Print {'\u00A0\u00A0\u00A0\u00A0'} {file.name}
                       </button>
                     </div>
                   ))}

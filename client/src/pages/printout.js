@@ -32,7 +32,7 @@ const PrintoutPage = () => {
     try {
       const token = JSON.parse(sessionStorage.getItem('token'));
       if (token) {
-        const response = await axios.get(`https://college-bookmart.onrender.com/api/upload/user/${statusFilter}`, {
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/upload/user/${statusFilter}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -61,8 +61,13 @@ const PrintoutPage = () => {
   
       console.log(files);
     }
-  
-    fetchFilesFromIndexedDB();
+    try{
+      fetchFilesFromIndexedDB();
+    }
+    catch{
+      
+    }
+   
   }, [statusFilter, fetchPrintouts]);
   
   // Function to retrieve files from IndexedDB
@@ -72,10 +77,12 @@ const PrintoutPage = () => {
   
       request.onsuccess = (event) => {
         const db = event.target.result;
-        const transaction = db.transaction('files', 'readonly');
-        const store = transaction.objectStore('files');
-  
-        const getAllRequest = store.getAll();
+
+        if (db.objectStoreNames.contains('files')) {
+          const transaction = db.transaction('files', 'readonly');
+          const store = transaction.objectStore('files');
+
+          const getAllRequest = store.getAll();
   
         getAllRequest.onsuccess = () => {
           resolve(getAllRequest.result);
@@ -85,6 +92,10 @@ const PrintoutPage = () => {
           console.error('Error fetching files from IndexedDB', err);
           reject(err);
         };
+        }
+        
+  
+        
       };
   
       request.onerror = (err) => {
@@ -211,44 +222,105 @@ const PrintoutPage = () => {
     setShowSummaryModal(true);
   };
 
-  const handleUpload = async () => {
+  const handleUpload = async (e) => {
     setBtnClicked(true);
     const files = fileInputRef.current.files;
     const formData = new FormData();
+    
     for (let i = 0; i < files.length; i++) {
-      formData.append('files', files[i]);
+      formData.append("files", files[i]);
     }
-
-    formData.append('pageCount', pageCount);
-    formData.append('price', price);
-    formData.append('Color', selectedColor);
-    formData.append('printMode', printMode);
-    formData.append('numCopies', numCopies);
-    formData.append('extraInstructions', extraInstructions);
-    formData.append('isReport', isReport.toString());
-    formData.append('dept', isReport ? department : '');
-
+  
+    formData.append("pageCount", pageCount);
+    formData.append("price", price);
+    formData.append("Color", selectedColor);
+    formData.append("printMode", printMode);
+    formData.append("numCopies", numCopies);
+    formData.append("extraInstructions", extraInstructions);
+    formData.append("isReport", isReport.toString());
+    formData.append("dept", isReport ? department : "");
+  
     let token = null;
     try {
-      token = JSON.parse(sessionStorage.getItem('token'));
-      if (!token) {
-        throw new Error('Invalid token');
-      }
+      token = JSON.parse(sessionStorage.getItem("token"));
+      if (!token) throw new Error("Invalid token");
     } catch {
-      navigate('/login');
+      navigate("/login");
       return;
     }
-
+  
     try {
-      const response = await axios.post('https://college-bookmart.onrender.com/api/upload/', formData, {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/upload/`, formData, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
-
+  
       if (response.status === 201) {
-        setMsg('Upload successful!');
+        console.log(response.data.id);
+  
+        const options = {
+          key: process.env.REACT_APP_RAZOR_PAY_KEY,
+          amount: price * 100,
+          currency: "INR",
+          name: "Campus BookMart",
+          description: "Test Transaction",
+          image: "https://example.com/your_logo",
+          order_id: response.data.id,
+          handler: async function (paymentResponse) {
+            try {
+              const confirmationResponse = await axios.post(
+                `${process.env.REACT_APP_BACKEND_URL}/api/upload/confirm`,
+                {
+                  orderId: paymentResponse.razorpay_order_id,
+                  paymentId: paymentResponse.razorpay_payment_id,
+                  signature: paymentResponse.razorpay_signature,
+                },
+                {
+                  headers: {
+                    Authorization: `Bearer ${token}`,
+                  },
+                }
+              );
+  
+              if (confirmationResponse.status === 200) {
+                setMsg("Order successfully placed and payment confirmed!");
+                setStatus(true);
+                setShowPopup(true);
+                setBtnClicked(false);
+                setShowSummaryModal(false);
+              }
+            } catch (error) {
+              console.error("Payment confirmation failed:", error);
+              setMsg("Payment confirmation failed. Please contact support.");
+              setStatus(false);
+              setShowPopup(true);
+            }
+          },
+          notes: {
+            address: "Razorpay Corporate Office",
+          },
+          theme: {
+            color: "#3399cc",
+          },
+        };
+  
+        const rzp1 = new window.Razorpay(options);
+        rzp1.on("payment.failed", function (response) {
+          // alert(response.error.code);
+          // alert(response.error.description);
+          // alert(response.error.source);
+          // alert(response.error.step);
+          // alert(response.error.reason);
+          // alert(response.error.metadata.order_id);
+          // alert(response.error.metadata.payment_id);
+        });
+  
+        rzp1.open();
+        e.preventDefault();
+  
+        setMsg("Upload successful!");
         setStatus(true);
         setDoRedirect(false);
         setShowPopup(true);
@@ -261,21 +333,22 @@ const PrintoutPage = () => {
         setShowPopup(true);
         setBtnClicked(false);
       } else {
-        setMsg('Upload failed. Please try again.');
+        setMsg("Upload failed. Please try again.");
         setStatus(false);
         setDoRedirect(false);
         setShowPopup(true);
         setBtnClicked(false);
       }
-    } catch {
-      setMsg('Upload failed. Please try again.');
+    } catch (error) {
+      console.error("Upload failed:", error);
+      setMsg("Upload failed. Please try again.");
       setStatus(false);
       setDoRedirect(false);
       setShowPopup(true);
       setBtnClicked(false);
     }
   };
-
+  
   const renderPrintouts = (printouts) => {
     return (
       <ul>
@@ -283,6 +356,8 @@ const PrintoutPage = () => {
           <div key={printout._id} className='print-details'>
 
             <div><p>Uploaded Date: </p><p>{new Date(printout.uploadDate).toLocaleString()}</p></div>
+            <div><p>Order Id: </p><p>{(printout._id).slice(-5)}</p></div>
+            
             {
               printout.isReport === 'Yes'?
               (<>
@@ -425,7 +500,7 @@ const PrintoutPage = () => {
           </Modal.Body>
           <Modal.Footer>
             {!btnClicked?
-            (<><Button className='btn-1 modal-btn' onClick={handleUpload}>Upload and Proceed to Pay</Button>
+            (<><Button className='btn-1 modal-btn' onClick={(e)=>{handleUpload(e)}}>Upload and Proceed to Pay</Button>
             <Button className='btn-3 cancel-btn modal-btn' onClick={() => setShowSummaryModal(false)}>Cancel</Button></>)
             :
             (<>

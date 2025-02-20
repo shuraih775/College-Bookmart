@@ -1,21 +1,24 @@
+require('dotenv').config();
 const { default: mongoose } = require('mongoose');
 const Uploaded = require('../models/uploadedfiles');
+const Transaction = require('../models/transactions');
 const User = require('../models/users');
 const PrintLog = require('../models/printLog');
 const { getUsername, getUserId } = require('./getusername.js');
 const multer = require('multer');
 const otpGenerator = require('otp-generator');
 const nodemailer = require('nodemailer');
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
 
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: process.env.EMAIL_SERVICE,
   auth: {
-    user: 'shuraihshaikh.cs22@bmsce.ac.in',
-    pass: '763513rakshitanhihai'
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   }
 });
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     
@@ -35,7 +38,7 @@ const upload = multer({
 
 
 const uploadController = {
-  upload:async (req, res) =>{
+  createOrder:async (req, res) =>{
     try {
       const authHeader = req.headers.authorization;
       if (!authHeader) {
@@ -103,20 +106,7 @@ const uploadController = {
           return (basePrice + colorPrice + duplexPrice) * numCopies * pageCount;
         };
 
-        const code = otpGenerator.generate(6, { digits: true, alphabets: false, upperCase: false, specialChars: false });
-        const mailOptions = {
-          from: 'shuraihshaikh.cs22@bmsce.ac.in',
-          to: email,
-          subject: 'Code for Prinout Pickup',
-          text: `Provide with this code when asked while recieving the printout: ${code}`
-        };
-        transporter.sendMail(mailOptions, (error, info) => {
-          if (error) {
-            console.log('Error sending email:', error);
-            return res.status(500).json({ message: 'Error sending OTP email' });
-          }
-          res.status(201).json({ message: 'OTP sent to email, please verify' });
-      });
+        
         const pageCount = req.body.pageCount;
        
         
@@ -129,35 +119,115 @@ const uploadController = {
         const price = calculatePrice(numCopies, Color, printMode, pageCount, isReport);
         const actualPrice = findActualPrice(pageCount,isReport,printMode,numCopies,Color);
         const extraInstructions = req.body.extraInstructions;
-        const status = 'pending';
-        const newUpload = new Uploaded({
-          username,
-          files,
-          Color,
-          printMode,
-          numCopies,
-          extraInstructions,
-          isReport,
-          department,
-          price,
-          pageCount, 
-          actualPrice,
-          status,
-          code
-        });
-        await newUpload.save();
+        const status = 'paymentIncomplete';
 
-        const newPrintLog = new PrintLog({
-          price,
-          actualPrice
-        });
-        await newPrintLog.save();
-        return res.status(201).json({ message: 'Uploaded successfully' });
+        var instance = new Razorpay({ key_id: 'rzp_test_kil3SNZFqiRrMV', key_secret: 'KPVnDBEcFTrILEFmGxWDVw8E' })
+       
+     const order = await instance.orders.create({
+      amount: price * 100,
+      currency: "INR",
+      receipt: "receipt#1",
+      
+      // notes: {
+      //     key1: "value3",
+      //     key2: "value2"
+      // }
+      })
+      if(!order){
+        return res.status(500).send("Error"); 
+      }
+
+      const newUpload = new Uploaded({
+        _id:order.id,
+        username,
+        files,
+        Color,
+        printMode,
+        numCopies,
+        extraInstructions,
+        isReport,
+        department,
+        price,
+        pageCount, 
+        actualPrice,
+        status,
+      });
+      await newUpload.save();
+      console.log(order)
+      return res.status(201).json(order)
+        
+
+        
       });
     } catch (error) {
-     
       
       return res.status(500).json({ message: 'Server error' });
+    }
+  },
+  confirmOrder:async (req,res)=>{
+    const authHeader = req.headers.authorization;
+      if (!authHeader) {
+        return res.status(401).json({ message: 'User not logged in' });
+      }
+
+      const tokenArray = authHeader.split(' ');
+      const token = tokenArray[1];
+      if (!token) {
+        return res.status(401).json({ message: 'User not logged in' });
+      }
+
+      const userId = await getUserId(token);
+      const user = await User.findById(userId);
+      const email = user.email;
+      if (!userId) {
+        return res.status(401).json({ message: 'Invalid token' });
+      }
+      const orderId  = req.body.orderId;
+      const paymentId  = req.body.paymentId;
+      const signature  = req.body.signature;
+
+      function generateHMAC(message, secret) {
+        const hmac = crypto.createHmac('sha256', secret);
+        hmac.update(message);
+        return hmac.digest('hex');
+    }
+    const msg = orderId+"|"+paymentId
+    const generatedSignature = generateHMAC(msg, 'KPVnDBEcFTrILEFmGxWDVw8E')
+
+    if (generatedSignature === signature){
+      
+      const order  = await Uploaded.findById(orderId);
+      const transaction = new Transaction({
+        transactionId:paymentId,
+        orderId,
+        bill_amt:order.price,
+        transactionFor:'Printout'
+      })
+      await transaction.save();
+      
+    const code = otpGenerator.generate(6, { digits: true, alphabets: false, upperCase: false, specialChars: false });
+      //   const mailOptions = {
+      //     from: 'shuraihshaikh.cs22@bmsce.ac.in',
+      //     to: email,
+      //     subject: 'Code for Prinout Pickup',
+      //     text: `Provide with this code when asked while recieving the printout: ${code}`
+      //   };
+      //   transporter.sendMail(mailOptions, (error, info) => {
+      //     if (error) {
+      //       console.log('Error sending email:', error);
+      //       return res.status(500).json({ message: 'Error sending OTP email' });
+      //     }
+      //     res.status(201).json({ message: 'OTP sent to email, please verify' });
+      // });
+      order.code = code;
+      order.status = 'pending';
+      await order.save()
+      const newPrintLog = new PrintLog({
+        price:order.price,
+        actualPrice:order.actualPrice
+      });
+      await newPrintLog.save();
+      return res.status(201).json({ message: 'Uploaded successfully' });
     }
   },
   addManualPrintout: async (req,res)=>{
@@ -209,7 +279,22 @@ const uploadController = {
         const actualPrice = findActualPrice(pageCount,isReport,printMode,numCopies,Color);
         const extraInstructions = "";
         const status = 'complete';
+
+
+        function generateRandomObjectId() {
+          const hexChars = '0123456789abcdef';
+          let objectId = '';
+          for (let i = 0; i < 24; i++) {
+              const randomIndex = Math.floor(Math.random() * hexChars.length);
+              objectId += hexChars[randomIndex];
+          }
+          return objectId;
+      }
+    
+     const _id = generateRandomObjectId()
+
         const newUpload = new Uploaded({
+          _id,
           username:'admin',
           files:[],
           Color,
@@ -231,10 +316,13 @@ const uploadController = {
           actualPrice
         });
         await newPrintLog.save();
+        
       }
+      res.status(200).json({message:"order created"})
     }
-      catch{
-
+      catch(error){
+        console.error(error)
+        res.status(500).json({message:"order created"})
       }
   },
   retrieve: async (req, res) => {
@@ -344,7 +432,7 @@ const uploadController = {
   markAsReadyToPick: async(req,res) => {
     try {
       const authHeader = req.headers.authorization;
-  
+      console.log(req.headers)
       if (!authHeader) {
         return res.status(401).json({ message: 'User not logged in' });
       }

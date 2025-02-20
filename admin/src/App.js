@@ -6,6 +6,7 @@ import OrdersPage from './pages/orders';
 import StationeryPage from './pages/stationery';
 import Login from'./pages/login';
 import Statistics from './pages/statistic';
+import Transaction from './pages/transaction_history';
 
 
 const App = () => {
@@ -19,6 +20,7 @@ const App = () => {
           <Route path="/printout" element={<PrintoutPage/>} />
           <Route path="/orders" element={<OrdersPage/>} />
           <Route path="/statistics" element={<Statistics/>} />
+          <Route path="/transaction" element={<Transaction/>} />
           <Route path="/login" element={<Login/>} />
           
         </Routes>

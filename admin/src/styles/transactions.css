@@ -1,0 +1,8 @@
+.transactions{
+    margin:3rem;
+}
+.transaction{
+    margin-top: 1rem;
+    border-bottom: 1px solid #ccc;
+    padding:.5rem
+}

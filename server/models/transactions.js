@@ -7,13 +7,20 @@ const transactionSchema = new mongoose.Schema({
         unique: true
     },
     orderId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'orders', 
         required: true
     },
     bill_amt: {
         type: Number,
         required: true
+    },
+    date:{
+        type: Date,
+        default: Date.now
+    },
+    transactionFor:{
+        type:String
     }
 });
 

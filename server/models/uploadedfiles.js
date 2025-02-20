@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 
 const uploadedSchema = new mongoose.Schema({
+    _id:{
+        type:String
+    },
 
     username: {
         type: String,

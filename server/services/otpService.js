@@ -1,4 +1,4 @@
-// services/otpService.js
+
 const otpGenerator = require('otp-generator');
 const OTP = require('../models/otp-store');
 const Printout = require('../models/uploadedfiles');

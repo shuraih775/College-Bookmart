@@ -7,6 +7,7 @@ const uploadRoute = require('./routes/upload');
 const authroute = require('./routes/auth');
 const productRoute = require('./routes/product');
 const orderRoute = require('./routes/orders');
+const paymentRoute = require('./routes/payment');
 
 const bodyParser = require('body-parser');
 
@@ -32,5 +33,6 @@ app.use('/api/auth', authroute);
 app.use('/api/upload',uploadRoute);
 app.use('/api/product',productRoute);
 app.use('/api/orders',orderRoute);
+app.use('/api/transaction',paymentRoute);
 
 module.exports = app;

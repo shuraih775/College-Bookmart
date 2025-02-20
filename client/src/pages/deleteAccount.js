@@ -19,7 +19,7 @@ const DeleteAccount = () => {
     if (confirmation.toLowerCase() === 'delete my account') {
       try {
         const token = JSON.parse(sessionStorage.getItem('token'));
-        const response = await axios.delete('https://college-bookmart.onrender.com/api/auth/', {
+        const response = await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/auth/`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

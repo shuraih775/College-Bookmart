@@ -1,5 +1,7 @@
-
+require('dotenv').config();
 const User = require('../models/users');
+const Uploaded = require('../models/uploadedfiles');
+const Order = require('../models/orders');
 const OTP = require('../models/otp-store');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -7,17 +9,16 @@ const otpGenerator = require('otp-generator');
 const nodemailer = require('nodemailer');
 const { getUsername,getUserId } = require('./getusername.js');
 
-const secretKey = "thisisnotgood"; 
 
 const generateToken = async (userId) => {
-    return jwt.sign({ userId }, secretKey);
+    return jwt.sign({ userId }, process.env.SECRET_KEY);
 };
 
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: process.env.EMAIL_SERVICE,
     auth: {
-      user: 'shuraihshaikh.cs22@bmsce.ac.in',
-      pass: '763513rakshitanhihai'
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
     }
   });
 const auth = {
@@ -198,10 +199,19 @@ const auth = {
         return res.status(401).json({ message: 'User not logged in' });
       }
       const userId = await getUserId(token);
+      console.log(userId)
+      const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
       await User.findByIdAndDelete(userId);
+      await Uploaded.deleteMany({ username: user.username });
+      await Order.deleteMany({ username: user.username });
       res.status(200).json({message:"Account deleted Succesfully"});
 
-        } catch {
+        } catch(error) {
+            console.error(error)
             return res.status(500).json({message: 'Server error'});
         }
     },
@@ -209,15 +219,22 @@ const auth = {
         try {
             const authHeader = req.headers.authorization;
             const newPassword = req.body.newPassword;
+            console.log(newPassword)
             if (!authHeader) {
                 return res.status(401).json({ message: 'User not logged in' });
             }
+            
+            
+
             const tokenArray = authHeader.split(' ');
             const token = tokenArray[1];
             if (!token) {
                 return res.status(401).json({ message: 'User not logged in' });
             }
+            console.log(token)
+            const username = await getUsername(token);
             const userId = await getUserId(token);
+            console.log(username)
             const hashedPassword = await bcrypt.hash(newPassword, 10); 
             await User.findByIdAndUpdate(userId, { password: hashedPassword });
             res.status(200).json({ message: "Password Changed Successfully" });
@@ -296,4 +313,4 @@ const auth = {
     
 };
 
-module.exports = { auth, secretKey };
+module.exports = { auth};

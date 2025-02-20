@@ -26,7 +26,7 @@ const PasswordReset = () => {
     e.preventDefault();
     setBtnClicked(true);
     try {
-      const response = await axios.post('https://college-bookmart.onrender.com/api/auth/send-reset-code', { email });
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/send-reset-code`, { email });
       if (response.status === 200) {
         setMsg(`Verification code sent to ${email}`);
         setIsCodeSent(true);
@@ -45,7 +45,7 @@ const PasswordReset = () => {
     e.preventDefault();
     setBtnClicked(true);
     try {
-      const response = await axios.post('https://college-bookmart.onrender.com/api/auth/verify-reset-code', { email, code });
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/verify-reset-code`, { email, code });
       if (response.status === 200) {
         const { token } = response.data;
         sessionStorage.setItem('token', token); 

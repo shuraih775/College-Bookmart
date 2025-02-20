@@ -2,7 +2,8 @@ const express = require('express');
 const uploadController = require('../controllers/upload');
 const router = express.Router();
 
-router.post('/', uploadController.upload);
+router.post('/', uploadController.createOrder);
+router.post('/confirm', uploadController.confirmOrder);
 router.post('/manualPrintout', uploadController.addManualPrintout);
 router.get('/', uploadController.retrieveAll);
 router.put('/:uploadId/complete',uploadController.markAsComplete);

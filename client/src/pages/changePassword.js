@@ -42,11 +42,11 @@ const handleSubmit = async(e) => {
         
     }
     try{
-       const token =  sessionStorage.getItem('token');
+       const token =  JSON.parse(sessionStorage.getItem('token'));
        if(!token){
         return;
        }
-    const res = await axios.put('https://college-bookmart.onrender.com/api/auth/change-password',{newPassword}, {
+    const res = await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/auth/change-password`,{newPassword}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -56,7 +56,7 @@ const handleSubmit = async(e) => {
         setStatus(true);
         setDoRedirect(true);
         setShowPopup(true);
-        // setBtnClicked(false);
+        setBtnClicked(false);
     }
     }
 catch(error){

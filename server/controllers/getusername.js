@@ -1,7 +1,8 @@
+require('dotenv').config();
 const User = require('../models/users');
 const jwt = require('jsonwebtoken');
 
-const secretKey = "thisisnotgood"; 
+ 
 
 const getUsernameById = async (userId) => {
     try {
@@ -21,7 +22,7 @@ const getUsernameById = async (userId) => {
 const getUsername = async (token) => {
     try {
         
-        const decoded = jwt.verify(token, secretKey);
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
         const userId = decoded.userId;
 
        
@@ -36,7 +37,7 @@ const getUsername = async (token) => {
 const getUserId = async (token) => {
     try {
         
-        const decoded = jwt.verify(token, secretKey);
+        const decoded = jwt.verify(token, process.env.SECRET_KEY);
         const userId = decoded.userId;
 
         return userId; 
