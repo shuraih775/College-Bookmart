@@ -6,7 +6,7 @@ import Popup from './popup';
 import '../styles/orders.css';
 import '../styles/printout.css';
 import qz from 'qz-tray';
-import { PDFDocument } from 'pdf-lib';
+// import { PDFDocument } from 'pdf-lib';
 
 function PrintoutPage() {
   const [pdfFiles, setPdfFiles] = useState([]);
