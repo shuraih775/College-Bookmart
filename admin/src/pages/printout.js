@@ -118,27 +118,29 @@ function PrintoutPage() {
   //     console.error('Error removing file:', err);
   //   }
   // };
-  async function extractPage(blob) {
-    const existingPdfBytes = blob
+//   async function extractPage(blob) {
+//     const existingPdfBytes = blob
 
-    // Load a PDFDocument from the existing PDF bytes
-    const pdfDoc = await PDFDocument.load(existingPdfBytes);
+//     // Load a PDFDocument from the existing PDF bytes
+//     const pdfDoc = await PDFDocument.load(existingPdfBytes);
 
-    // Create a new PDFDocument
-    const newPdfDoc = await PDFDocument.create();
+//     // Create a new PDFDocument
+//     const newPdfDoc = await PDFDocument.create();
 
-    // Copy the first 5 pages
-    const pages = await newPdfDoc.copyPages(pdfDoc, [0]);
-    pages.forEach((page) => {
-        newPdfDoc.addPage(page);
-    });
+//     // Copy the first 5 pages
+//     const pages = await newPdfDoc.copyPages(pdfDoc, [0]);
+//     pages.forEach((page) => {
+//         newPdfDoc.addPage(page);
+//     });
 
-    // Serialize the new PDFDocument to bytes
-    const pdfBytes = await newPdfDoc.save();
+//     // Serialize the new PDFDocument to bytes
+//     const pdfBytes = await newPdfDoc.save();
 
-    // Return the new PDF as a Blob URL or save it to the file system
-    return new Blob([pdfBytes], { type: 'application/pdf' });
-}
+//     // Return the new PDF as a Blob URL or save it to the file system
+//     return new Blob([pdfBytes], { type: 'application/pdf' });
+// }
+
+
   const printFile = async (copies, printMode, Color, isReport, fileBlob) => {
     try {
       if (!qz.websocket.isActive()) {
