@@ -10,7 +10,7 @@ Designed and developed a website for my college bookstore, aiming to reduce crow
 
 
 ***
-# Instructions to Run the Projects
+# Instructions to Run the Project
 
 ## Client Setup
 
