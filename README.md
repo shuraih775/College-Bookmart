@@ -6,7 +6,19 @@ Designed and developed a website for my college bookstore, aiming to reduce crow
 
 [Visit Campus Bookmart (Temporary)](https://campusbookmart.netlify.app)
 
+credentials: 
+```
+mail: shuraihshaikh.cs22@bmsce.ac.in
+password: 123456
+```
+
 [Visit Campus Bookmart Admin Site (Temporary)](https://campusbookmartadmin.netlify.app)
+
+credentials:
+```
+mail: shuraih15@gmail.com
+password: 123456
+```
 
 
 ***
