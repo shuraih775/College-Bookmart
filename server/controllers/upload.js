@@ -121,7 +121,7 @@ const uploadController = {
         const extraInstructions = req.body.extraInstructions;
         const status = 'paymentIncomplete';
 
-        var instance = new Razorpay({ key_id: 'rzp_test_kil3SNZFqiRrMV', key_secret: 'KPVnDBEcFTrILEFmGxWDVw8E' })
+        var instance = new Razorpay({ key_id: process.env.RZP_KEY, key_secret: process.env.RZP_SECRET })
        
      const order = await instance.orders.create({
       amount: price * 100,

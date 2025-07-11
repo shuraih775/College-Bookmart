@@ -61,7 +61,7 @@ const orderController = {
           orderedProduct.subtypes = product.subtypes;
         }
       }
-      var instance = new Razorpay({ key_id: 'rzp_live_MWPX9UNMwzB4Qq', key_secret: 'EqPwegqdzkBek2WYr1ZD5YaX' })
+      var instance = new Razorpay({ key_id: process.env.RZP_KEY, key_secret: process.env.RZP_SECRET })
 
      const order = await instance.orders.create({
       amount: totalAmount * 100,
