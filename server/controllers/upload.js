@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { default: mongoose } = require('mongoose');
-const Uploaded = require('../models/uploadedfiles');
+const Uploaded = require('../models/uploads.js');
 const Transaction = require('../models/transactions');
 const User = require('../models/users');
 const PrintLog = require('../models/printLog');
@@ -96,11 +96,11 @@ const uploadController = {
     return (basePrice + colorPrice + duplexPrice) * numCopies * pageCount; 
 
         }
-        const calculatePrice = (numCopies, Color, printMode, pageCount, isReport) => {
-          if (isReport) {
+        const calculatePrice = (numCopies, colorType, printMode, pageCount, isReport) => {
+          if (isReport == 'true') {
             return (20 + pageCount * 2) * numCopies;
           }
-          const colorPrice = Color === 'color' ? 8 : 0;
+          const colorPrice = colorType === 'color' ? 8 : 0;
           const duplexPrice = printMode === 'duplex' ? 0.5 : 1;
           const basePrice = 1;
           return (basePrice + colorPrice + duplexPrice) * numCopies * pageCount;

@@ -1,6 +1,6 @@
 require('dotenv').config();
 const User = require('../models/users');
-const Uploaded = require('../models/uploadedfiles');
+const Uploaded = require('../models/uploads');
 const Order = require('../models/orders');
 const OTP = require('../models/otp-store');
 const bcrypt = require('bcryptjs');

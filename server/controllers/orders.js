@@ -148,6 +148,8 @@ const orderController = {
       })
       await transaction.save();
       const orderItems = order.order_items;
+      order.transaction_id = paymentId;
+      await order.save()
       orderItems.map( async(orderedProduct)=>{
         
         const product = await Product.findByIdAndUpdate(orderedProduct._id);
@@ -431,8 +433,7 @@ catch{
 
 }
 },
-cancelOrder :async (req, res) => {
-  
+cancelOrder: async (req, res) => {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
@@ -451,18 +452,30 @@ cancelOrder :async (req, res) => {
     }
 
     const orderId = req.params.orderId;
-
-    
-
     const order = await Order.findById(orderId);
     if (!order) {
-      
       return res.status(404).json({ message: "Order doesn't exist" });
     }
 
     if (username !== order.username) {
-      
       return res.status(403).json({ message: 'Not authorized to cancel this order' });
+    }
+
+    // Refund 
+    const razorpay = new Razorpay({
+      key_id: process.env.RZP_KEY,
+      key_secret: process.env.RZP_SECRET,
+    });
+
+    if (order.transaction_id) {
+      try {
+        await razorpay.payments.refund(order.transaction_id, {
+          amount: order.bill_amt*100 
+        });
+      } catch (err) {
+        console.error('Refund failed:', err);
+        return res.status(500).json({ message: 'Refund failed' });
+      }
     }
 
     order.status = 'canceled';
@@ -489,17 +502,14 @@ cancelOrder :async (req, res) => {
         }
       } catch (error) {
         console.error('Error updating product:', error);
-        
         return res.status(500).json({ message: 'Server error while updating product' });
       }
     }
 
-    
-    res.status(200).json({ message: 'Order cancelled' });
+    res.status(200).json({ message: 'Order cancelled and refunded successfully' });
 
   } catch (error) {
     console.error('Error cancelling order:', error);
-    
     res.status(500).json({ message: 'Server error while cancelling order' });
   }
 }

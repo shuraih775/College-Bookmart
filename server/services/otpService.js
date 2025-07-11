@@ -1,7 +1,7 @@
 
 const otpGenerator = require('otp-generator');
 const OTP = require('../models/otp-store');
-const Printout = require('../models/uploadedfiles');
+const Printout = require('../models/uploads');
 const Order = require('../models/orders.js');
 
 const transporter = require('../config/config'); 

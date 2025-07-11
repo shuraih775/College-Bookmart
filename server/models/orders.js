@@ -4,7 +4,7 @@ const orderSchema = new mongoose.Schema({
     _id: { type: String },
     username: {
         type: String,
-        ref:'User',
+        ref: 'User',
         required: true
     },
     order_date: {
@@ -13,9 +13,9 @@ const orderSchema = new mongoose.Schema({
     },
     order_items: [{
         name: String,
-        quantity:Number,
+        quantity: Number,
         price: Number,
-        type_:String,
+        type_: String,
         subtypes: {
             type: Map,
             of: String
@@ -25,16 +25,18 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    code:{
-        type:String
+    code: {
+        type: String
     },
-    status:{
-        type:String,
-        default:"pending"
+    status: {
+        type: String,
+        default: "pending"
+    },
+    transaction_id: {
+        type: String, 
+        default: null
     }
-    
 });
 
 const Order = mongoose.model('orders', orderSchema);
-
 module.exports = Order;
